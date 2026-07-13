@@ -1,10 +1,10 @@
 # Build Progress
 
-- Current status: Mobile select, rank tier colors, weekday colors, and first-week SKIP regression coverage complete, pushed, and deployed to Vercel Preview
-- Completed: Existing MVP and mobile fixes; native finite selects; shared rank-tier palette; actual-date Sunday/Saturday coloring shared with PNG; invalid SKIP distinction; valid first-week SKIP extension verified for month-mid/month-start/week-mid/month-crossing plus weekly/manual grants
-- In progress: None
-- Next: Confirm native selects, weekday colors, tier colors, and first-week SKIP behavior on a physical mobile device
-- Tests: `npm run check` passed (46/46 unit tests, typecheck, lint, production build); weekday/month-start and SKIP timing regression tests pass
+- Current status: Mobile compact event labels and two-line calendar memos complete; commit, push, and Preview verification in progress
+- Completed: Existing MVP and QA fixes; fixed mobile event labels (`SP+N`, `アップ`, `キープ`, `ダウン`); full labels retained on wider screens; normalized two-line memo previews; matching compact events and memo excerpts in PNG
+- In progress: Commit, push, and updated Preview verification
+- Next: Confirm multiple events and memo rendering on a physical mobile device
+- Tests: `npm run check` passed (53/53 unit tests, typecheck, lint, production build); compact labels, multiple events, blank/normalized memo, long two-line memo, and mobile CSS guards pass
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)

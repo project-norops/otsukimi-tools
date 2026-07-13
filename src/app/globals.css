@@ -578,11 +578,20 @@ textarea {
   background: #fff0df;
   color: #9c5618;
 }
+.event-label-compact {
+  display: none;
+}
 .memo {
+  display: -webkit-box;
   max-width: 100%;
-  white-space: nowrap;
+  min-height: 2.5em;
+  white-space: normal;
+  line-height: 1.25;
   overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   color: #876b26;
   background: #fff8d9;
   padding: 2px 4px;
@@ -780,6 +789,16 @@ textarea {
   .rank-chip {
     font-size: 8px;
   }
+  .event-label-full {
+    display: none;
+  }
+  .event-label-compact {
+    display: inline;
+  }
+  .memo {
+    width: 100%;
+    font-size: 9px;
+  }
   .site-header nav {
     gap: 10px;
     font-size: 12px;
@@ -843,10 +862,7 @@ textarea {
     font-size: 11px;
   }
   .day-cell {
-    min-height: 86px;
-  }
-  .memo {
-    display: none;
+    min-height: 118px;
   }
   .value-picker {
     grid-template-columns: repeat(4, 1fr);

@@ -15,6 +15,7 @@ import { shareOrDownloadCalendar } from "@/lib/calendar-share";
 import { createRankBandSegments, type RankBandSegment } from "@/lib/rank-bands";
 import { getRankPalette } from "@/lib/rank-colors";
 import { getCalendarCell, getWeekdayKind, WEEKDAY_COLORS, WEEKDAY_HEADERS } from "@/lib/calendar-display";
+import { getCalendarEventLabels, getPngMemoLines, normalizeCalendarMemo } from "@/lib/calendar-content";
 
 const values: { value: PlanValue; label: string }[] = [
   { value: 6, label: "+6" },
@@ -131,7 +132,7 @@ export function RankPlanner() {
     const days = result.days.filter((day) => day.date.startsWith(month));
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
-    canvas.height = 900;
+    canvas.height = 1100;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.fillStyle = "#FFFDFE";
@@ -153,10 +154,10 @@ export function RankPlanner() {
       const date = parseDate(day.date),
         cell = first + date.getDate() - 1,
         x = 54 + (cell % 7) * 154,
-        y = 160 + Math.floor(cell / 7) * 126;
+        y = 160 + Math.floor(cell / 7) * 146;
       ctx.fillStyle = "#FFF5F8";
       ctx.beginPath();
-      ctx.roundRect(x, y, 138, 110, 18);
+      ctx.roundRect(x, y, 138, 132, 18);
       ctx.fill();
       ctx.font = "22px sans-serif";
       ctx.fillStyle = WEEKDAY_COLORS[getWeekdayKind(day.date)];
@@ -164,7 +165,7 @@ export function RankPlanner() {
     });
     rankBands.filter((band) => band.month === month).forEach((band) => {
       const x = 54 + (band.startColumn - 1) * 154;
-      const y = 160 + (band.row - 1) * 126 + 35;
+      const y = 160 + (band.row - 1) * 146 + 35;
       const width = band.span * 154 - 16;
       const palette = getRankPalette(band.rank);
       ctx.fillStyle = palette.background;
@@ -184,23 +185,20 @@ export function RankPlanner() {
       const date = parseDate(day.date),
         cell = first + date.getDate() - 1,
         x = 54 + (cell % 7) * 154,
-        y = 160 + Math.floor(cell / 7) * 126;
+        y = 160 + Math.floor(cell / 7) * 146;
       ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68";
       ctx.font = "700 25px sans-serif";
       ctx.fillText(day.skipValid ? labelPlan(day.plan.value) : "SKIP不可", x + 12, y + 82);
-      if (day.rankEvent) {
+      const events = getCalendarEventLabels(day);
+      if (events.length > 0) {
         ctx.fillStyle = "#555";
-        ctx.font = "16px sans-serif";
-        ctx.fillText(
-          day.rankEvent.type === "up"
-            ? "ランクUP"
-            : day.rankEvent.type === "keep"
-              ? "キープ"
-              : "ランクDOWN",
-          x + 12,
-          y + 105,
-        );
+        ctx.font = "700 13px sans-serif";
+        ctx.fillText(events.map((event) => event.compact).join(" / "), x + 12, y + 101, 116);
       }
+      const memoLines = getPngMemoLines(day.plan.memo);
+      ctx.fillStyle = "#755F25";
+      ctx.font = "12px sans-serif";
+      memoLines.forEach((line, index) => ctx.fillText(line, x + 12, y + 117 + index * 13, 116));
     });
     canvas.toBlob(
       (blob) => blob && download(blob, `rank-plan-${month}.png`),
@@ -618,27 +616,20 @@ function MonthCalendar({
                   {labelPlan(day.plan.value)}
                 </b>
               )}
-              {day.weeklyGrant > 0 && (
-                <small className="grant-chip">スキパ +1</small>
-              )}
-              {day.manualGrant > 0 && (
-                <small className="grant-chip">スキパ +{day.manualGrant}</small>
-              )}
+              {getCalendarEventLabels(day).map((event) => (
+                <small className={event.className} key={event.key}>
+                  <span className="event-label-full">{event.full}</span>
+                  <span className="event-label-compact">{event.compact}</span>
+                </small>
+              ))}
               {anniversaries[day.date]?.map((event) => (
                 <small className="anniversary-chip" key={event.label}>
                   {event.label}
                 </small>
               ))}
-              {day.rankEvent && (
-                <small className={`rank-chip ${day.rankEvent.type}`}>
-                  {day.rankEvent.type === "up"
-                    ? "ランクUP"
-                    : day.rankEvent.type === "keep"
-                      ? "キープ"
-                      : "ランクDOWN"}
-                </small>
+              {normalizeCalendarMemo(day.plan.memo) && (
+                <small className="memo">{normalizeCalendarMemo(day.plan.memo)}</small>
               )}
-              {day.plan.memo && <small className="memo">{day.plan.memo}</small>}
             </button>
           );
         })}
