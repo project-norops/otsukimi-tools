@@ -1,8 +1,8 @@
 # Build Progress
 
-- Current status: Planner guide and current-state input copy refinements complete and ready to push
+- Current status: Planner guide and current-state input copy refinements complete and pushed
 - Completed: Existing MVP and QA fixes; iOS input-focus zoom prevention; compact three-step planner guide; guide step 1 now includes liver name and debut date; `表示名` is presented as `ライバー名`; debut-date input explains anniversary/calendar behavior with a mobile-safe wrapping note; simulation and anniversary calculations are unchanged
-- In progress: Commit and push
+- In progress: None
 - Next: Confirm guide density and memo focus behavior on a physical iPhone
 - Tests: `npm run check` passed (63/63 unit tests, typecheck, lint, production build); guide placement/copy, debut-date note, and mobile wrapping regression tests pass
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present; mobile layout is covered by static regression guards pending physical-device review
