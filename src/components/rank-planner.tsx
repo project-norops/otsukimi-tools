@@ -221,7 +221,9 @@ export function RankPlanner() {
             </p>
           </div>
           <ol>
-            <li>現在のランク・累計スコア・スキパ所持数を入力</li>
+            <li>
+              ライバー名・現在のランク・累計スコア・スキパ所持数・デビュー日を入力
+            </li>
             <li>カレンダーの日付をタップして、予定スコア・SKIP・記念日・メモを設定</li>
             <li>計算結果を確認し、PNG保存またはカレンダーへ追加</li>
           </ol>
@@ -320,6 +322,9 @@ export function RankPlanner() {
                   updateDraft("debutDate", e.target.value || undefined)
                 }
               />
+              <span className="field-note">
+                デビュー日を入力すると、周年・月ごとの記念日がカレンダーに表示されます
+              </span>
             </label>
             <label>
               計画名（任意）
@@ -331,7 +336,7 @@ export function RankPlanner() {
               />
             </label>
             <label>
-              表示名（任意）
+              ライバー名（任意）
               <input
                 maxLength={30}
                 value={draft.displayName ?? ""}

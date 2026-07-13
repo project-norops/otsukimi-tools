@@ -19,12 +19,24 @@ describe("planner guide", () => {
   });
 
   it("includes the three steps and brief supporting notes", () => {
-    expect(component).toContain("現在のランク・累計スコア・スキパ所持数を入力");
+    expect(component).toContain(
+      "ライバー名・現在のランク・累計スコア・スキパ所持数・デビュー日を入力",
+    );
     expect(component).toContain("予定スコア・SKIP・記念日・メモを設定");
     expect(component).toContain("PNG保存またはカレンダーへ追加");
     expect(component).toContain("入力変更後はランク推移を自動再計算します。");
     expect(component).toContain("「SP+1」はスキパ付与を表します。");
     expect(component).toContain("IRIAM公式とは関係ありません。");
+  });
+
+  it("labels the liver name and explains the optional debut date", () => {
+    expect(component).toContain("ライバー名（任意）");
+    expect(component).toContain(
+      "デビュー日を入力すると、周年・月ごとの記念日がカレンダーに表示されます",
+    );
+    expect(css).toMatch(
+      /\.field-note\s*\{[\s\S]*?max-width: 100%;[\s\S]*?overflow-wrap: anywhere;/,
+    );
   });
 
   it("uses shrinkable columns and a compact single-column mobile layout", () => {
