@@ -213,6 +213,26 @@ export function RankPlanner() {
           <h1>ランク計画カレンダー</h1>
           <p>いまの状態を入力して、3か月先までのランク推移を組み立てます。</p>
         </div>
+        <aside className="planner-guide" aria-labelledby="planner-guide-title">
+          <div className="planner-guide-heading">
+            <h2 id="planner-guide-title">使い方</h2>
+            <p>
+              現在のランクと予定スコアを入力すると、3か月分のランク推移を自動計算します。
+            </p>
+          </div>
+          <ol>
+            <li>現在のランク・累計スコア・スキパ所持数を入力</li>
+            <li>カレンダーの日付をタップして、予定スコア・SKIP・記念日・メモを設定</li>
+            <li>計算結果を確認し、PNG保存またはカレンダーへ追加</li>
+          </ol>
+          <div className="planner-guide-notes">
+            <span>入力変更後はランク推移を自動再計算します。</span>
+            <span>「SP+1」はスキパ付与を表します。</span>
+          </div>
+          <p className="planner-guide-unofficial">
+            非公式ツールであり、IRIAM公式とは関係ありません。
+          </p>
+        </aside>
         <form
           className="setup-card"
           onSubmit={(event) => {

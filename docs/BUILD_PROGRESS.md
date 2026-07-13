@@ -1,11 +1,11 @@
 # Build Progress
 
-- Current status: iOS WebKit input-focus zoom prevention complete, pushed, and deployed to Vercel Preview
-- Completed: Existing MVP and QA fixes; skip grant memo removed from type and UI; scrollable sheet body with dvh/safe-area sticky footer; simulation decision totals; editable mobile `input` and `textarea` fields use a 16px font size to prevent focus zoom in iOS Safari/Chrome
-- In progress: None
-- Next: Confirm memo focus behavior on physical iPhone in Safari and Chrome
-- Tests: `npm run check` passed (59/59 unit tests, typecheck, lint, production build); mobile CSS regression verifies editable `input` and `textarea` font size is at least 16px
-- Known issues: Automated visual browser review remains unavailable because no browser backend was present
+- Current status: Compact rank-planner usage guide complete and ready to push
+- Completed: Existing MVP and QA fixes; iOS input-focus zoom prevention; initial planner screen now shows a compact three-step guide before current-state input, including automatic recalculation, `SP+1`, and unofficial-tool notes; mobile guide collapses to a compact shrinkable single column
+- In progress: Commit and push
+- Next: Confirm guide density and memo focus behavior on a physical iPhone
+- Tests: `npm run check` passed (62/62 unit tests, typecheck, lint, production build); guide placement, required copy, and mobile layout regression tests pass; local `/tools/rank-calendar` returned HTTP 200
+- Known issues: Automated visual browser review remains unavailable because no browser backend was present; mobile layout is covered by static regression guards pending physical-device review
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)
 - Preview deployment: `dpl_H956theUzwCwfYC5bVqucwjsZxDP` (`READY`)

@@ -217,6 +217,74 @@ section > h1 {
 .tool-intro {
   max-width: 720px;
 }
+.planner-guide {
+  width: 100%;
+  min-width: 0;
+  max-width: 760px;
+  margin: 18px auto 0;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, var(--pale-pink), #f6fff7);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow-wrap: anywhere;
+}
+.planner-guide-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.planner-guide h2 {
+  flex: 0 0 auto;
+  margin: 0;
+  color: #d83e68;
+  font-size: 18px;
+}
+.planner-guide-heading p,
+.planner-guide-unofficial {
+  margin: 0;
+}
+.planner-guide-heading p {
+  color: #555;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+.planner-guide ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 10px;
+  padding-left: 22px;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.planner-guide li {
+  min-width: 0;
+  padding-left: 2px;
+}
+.planner-guide li::marker {
+  color: #d83e68;
+  font-weight: 900;
+}
+.planner-guide-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: #357346;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.planner-guide-unofficial {
+  margin-top: 5px;
+  color: var(--sub);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.planner-guide + .setup-card {
+  margin-top: 16px;
+}
 .setup-card,
 .month-card,
 .warnings,
@@ -893,6 +961,26 @@ textarea {
   }
   .setup-card {
     padding: 20px;
+  }
+  .planner-guide {
+    padding: 14px 16px;
+    border-radius: 18px;
+  }
+  .planner-guide-heading {
+    display: block;
+  }
+  .planner-guide-heading p {
+    margin-top: 3px;
+    font-size: 12px;
+  }
+  .planner-guide ol {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+    margin: 9px 0 7px;
+  }
+  .planner-guide-notes {
+    display: grid;
+    gap: 1px;
   }
   .planner-title {
     flex-direction: column;
