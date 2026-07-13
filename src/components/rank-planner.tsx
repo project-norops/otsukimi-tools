@@ -468,7 +468,7 @@ export function RankPlanner() {
           if (e.target === sheetRef.current) sheetRef.current.close();
         }}
       >
-        <div>
+        <div className="day-sheet-panel">
           <header>
             <div>
               <span className="eyebrow">day plan</span>
@@ -489,7 +489,8 @@ export function RankPlanner() {
               ×
             </button>
           </header>
-          <div className="value-picker">
+          <div className="day-sheet-body">
+            <div className="value-picker">
             {values.map((item) => (
               <button
                 key={String(item.value)}
@@ -499,8 +500,8 @@ export function RankPlanner() {
                 {item.label}
               </button>
             ))}
-          </div>
-          <label>
+            </div>
+            <label>
             メモ
             <textarea
               maxLength={50}
@@ -508,8 +509,8 @@ export function RankPlanner() {
               onChange={(e) => updateDay({ memo: e.target.value })}
               placeholder="50文字まで"
             />
-          </label>
-          {selected && parseDate(selected).getDay() === 1 && (
+            </label>
+            {selected && parseDate(selected).getDay() === 1 && (
             <label className="weekly-grant-setting">
               <span>
                 <b>週次スキパ付与</b>
@@ -522,8 +523,7 @@ export function RankPlanner() {
                 aria-label="月曜の週次スキパ付与を予定する"
               />
             </label>
-          )}
-          <div className="form-grid manual-grant-fields">
+            )}
             <label>
               臨時スキパ付与
               <input
@@ -535,32 +535,34 @@ export function RankPlanner() {
                 }
               />
             </label>
-            <label>
-              付与メモ
-              <input
-                maxLength={50}
-                value={selectedPlan?.manualGrantMemo ?? ""}
-                onChange={(e) => updateDay({ manualGrantMemo: e.target.value })}
-              />
-            </label>
-          </div>
-          {selectedDay && (
-            <p className="day-result">
-              計算後：{selectedDay.rankAfter} / {selectedDay.scoreAfter}点 /
-              スキパ{selectedDay.skipPasses}枚
-            </p>
-          )}
-          {selectedAnniversaries.map((item) => (
+            {selectedDay?.rankEvent && selectedDay.decisionScore !== undefined ? (
+              <div className={`day-result decision ${selectedDay.rankEvent.type}`}>
+                <strong>
+                  判定結果：合計{selectedDay.decisionScore}点 → {selectedDay.rankEvent.label}
+                </strong>
+                <span>次期間スコア：{selectedDay.scoreAfter}点</span>
+                <span>スキパ残数：{selectedDay.skipPasses}枚</span>
+              </div>
+            ) : selectedDay ? (
+              <p className="day-result">
+                計算後：{selectedDay.rankAfter} / {selectedDay.scoreAfter}点 /
+                スキパ{selectedDay.skipPasses}枚
+              </p>
+            ) : null}
+            {selectedAnniversaries.map((item) => (
             <p className="anniversary-detail" key={item.label}>
               {item.label}
             </p>
-          ))}
-          <button
-            className="button primary-wide"
-            onClick={() => sheetRef.current?.close()}
-          >
-            保存して閉じる
-          </button>
+            ))}
+          </div>
+          <footer className="day-sheet-footer">
+            <button
+              className="button primary-wide"
+              onClick={() => sheetRef.current?.close()}
+            >
+              保存して閉じる
+            </button>
+          </footer>
         </div>
       </dialog>
       <Disclaimer />

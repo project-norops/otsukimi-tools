@@ -20,7 +20,7 @@ export function simulate(input: PlannerInput, plans: Record<string, DayPlan>, to
     const isMonday = parseDate(date).getDay() === 1;
     const grants = applySkipPassGrants(skipPasses, isMonday && (plan.weeklyGrant ?? true), plan.manualGrant ?? 0);
     skipPasses = grants.total;
-    let skipValid = true, periodEnds = false, rankEvent: RankEvent | undefined;
+    let skipValid = true, periodEnds = false, rankEvent: RankEvent | undefined, decisionScore: number | undefined;
     if (plan.value === "skip" && skipPasses > 0) {
       skipPasses -= 1;
     } else {
@@ -28,16 +28,18 @@ export function simulate(input: PlannerInput, plans: Record<string, DayPlan>, to
       if (typeof plan.value === "number") score += plan.value;
       periodRemaining -= 1;
       if (score >= RANK_RULES.upScore) {
+        decisionScore = score;
         rank = moveRank(rank, 1); rankEvent = { type: "up", from: rankBefore, to: rank, label: rankBefore === rank ? `${rank} 上限キープ` : `${rankBefore} → ${rank} ランクアップ` };
         score = 0; periodRemaining = RANK_RULES.periodDays; periodEnds = true;
       } else if (periodRemaining === 0) {
+        decisionScore = score;
         periodEnds = true;
         if (score >= RANK_RULES.keepScore) rankEvent = { type: "keep", from: rank, to: rank, label: `${rank} キープ` };
         else { const next = moveRank(rank, -1); rankEvent = { type: "down", from: rank, to: next, label: rank === next ? `${rank} 下限キープ` : `${rank} → ${next} ランクダウン` }; rank = next; warnings.push({ level: "warning", date, message: `${rankEvent.label}見込みです。` }); }
         score = 0; periodRemaining = RANK_RULES.periodDays;
       }
     }
-    days.push({ date, plan, rankBefore, rankAfter: rank, scoreBefore, scoreAfter: score, calculationDay: RANK_RULES.periodDays - periodRemaining + 1, skipPasses, weeklyGrant: grants.weeklyGrant, manualGrant: grants.manualGrant, skipValid, periodEnds, rankEvent });
+    days.push({ date, plan, rankBefore, rankAfter: rank, scoreBefore, scoreAfter: score, decisionScore, calculationDay: RANK_RULES.periodDays - periodRemaining + 1, skipPasses, weeklyGrant: grants.weeklyGrant, manualGrant: grants.manualGrant, skipValid, periodEnds, rankEvent });
   }
   return { days, warnings };
 }
