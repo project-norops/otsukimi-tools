@@ -1,10 +1,10 @@
 # Build Progress
 
-- Current status: MVP complete, pushed to dedicated GitHub repository, and preview deployed to dedicated Vercel project
-- Completed: Next.js scaffold; types; centralized rank and skip-pass rules; manual grants; anniversary generator; 3-month simulator; 12 unit tests; metadata-driven portal and category pages; planner setup, calendar, bottom sheet, warnings; ICS and monthly PNG export; disclaimer; manifest and dedicated icon
-- In progress: None
-- Next: Human mobile review of the preview deployment
-- Tests: `npm run check` passed (12/12 unit tests, typecheck, lint, production build); `/` and `/tools/rank-calendar` returned HTTP 200; automated visual browser review unavailable because no browser backend was present
+- Current status: Mobile UI fixes and rank progress enhancements complete; commit, push, and Vercel deployment verification in progress
+- Completed: Next.js scaffold; centralized rules and 3-month simulator; metadata-driven portal; planner and exports; PWA; mobile bottom-sheet weekly grant setting fix; daily start-of-day rank chips; nearest rank-decision summary; simplified action errors; current rank and keep/up progress cards; 18 unit tests
+- In progress: Commit, push, and Vercel Git deployment verification
+- Next: Confirm the updated preview deployment is READY and verify its public route
+- Tests: `npm run check` passed (18/18 unit tests, typecheck, lint, production build); 375px mobile constraints reviewed in CSS (`min-width`, fixed checkbox width, `88dvh` scroll area, single-column manual grants)
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)

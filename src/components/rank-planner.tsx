@@ -1,43 +1,571 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
-import { RANKS, type DayPlan, type PlannerInput, type PlanValue } from "@/types/planner";
+import {
+  RANKS,
+  type DayPlan,
+  type PlannerInput,
+  type PlanValue,
+} from "@/types/planner";
 import { simulate } from "@/lib/simulator";
 import { generateAnniversaries } from "@/lib/anniversaries";
 import { createIcs } from "@/lib/ics";
 import { addDays, formatDate, parseDate } from "@/lib/date-utils";
+import { getActionErrors, getNextRankDecision, getRankProgress } from "@/lib/planner-view";
 
-const values: { value: PlanValue; label: string }[] = [{ value: 6, label: "+6" }, { value: 4, label: "+4" }, { value: 2, label: "+2" }, { value: 1, label: "+1" }, { value: "skip", label: "SKIP" }, { value: "rest", label: "休み" }, { value: "unset", label: "未設定" }];
-const labelPlan = (value: PlanValue) => values.find(item => item.value === value)?.label ?? "";
+const values: { value: PlanValue; label: string }[] = [
+  { value: 6, label: "+6" },
+  { value: 4, label: "+4" },
+  { value: 2, label: "+2" },
+  { value: 1, label: "+1" },
+  { value: "skip", label: "SKIP" },
+  { value: "rest", label: "休み" },
+  { value: "unset", label: "未設定" },
+];
+const labelPlan = (value: PlanValue) =>
+  values.find((item) => item.value === value)?.label ?? "";
 const today = formatDate(new Date());
-const download = (blob: Blob, filename: string) => { const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); };
+const download = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
 
 export function RankPlanner() {
-  const [input, setInput] = useState<PlannerInput>({ baseDate: today, rank: "C1", score: 0, remainingDaysDisplay: 6, skipPasses: 0 });
-  const [draft, setDraft] = useState(input); const [started, setStarted] = useState(false); const [plans, setPlans] = useState<Record<string, DayPlan>>({}); const [selected, setSelected] = useState<string>();
+  const [input, setInput] = useState<PlannerInput>({
+    baseDate: today,
+    rank: "C1",
+    score: 0,
+    remainingDaysDisplay: 6,
+    skipPasses: 0,
+  });
+  const [draft, setDraft] = useState(input);
+  const [started, setStarted] = useState(false);
+  const [plans, setPlans] = useState<Record<string, DayPlan>>({});
+  const [selected, setSelected] = useState<string>();
   const sheetRef = useRef<HTMLDialogElement>(null);
   const result = useMemo(() => simulate(input, plans), [input, plans]);
-  const anniversaries = useMemo(() => input.debutDate ? generateAnniversaries(input.debutDate, input.baseDate, addDays(input.baseDate, 91)) : [], [input]);
-  const anniversaryMap = useMemo(() => Object.groupBy(anniversaries, item => item.date), [anniversaries]);
-  const months = useMemo(() => Object.entries(Object.groupBy(result.days, day => day.date.slice(0, 7))), [result]);
+  const anniversaries = useMemo(
+    () =>
+      input.debutDate
+        ? generateAnniversaries(
+            input.debutDate,
+            input.baseDate,
+            addDays(input.baseDate, 91),
+          )
+        : [],
+    [input],
+  );
+  const anniversaryMap = useMemo(
+    () => Object.groupBy(anniversaries, (item) => item.date),
+    [anniversaries],
+  );
+  const months = useMemo(
+    () =>
+      Object.entries(
+        Object.groupBy(result.days, (day) => day.date.slice(0, 7)),
+      ),
+    [result],
+  );
   const current = result.days[0];
-  const updateDraft = <K extends keyof PlannerInput>(key: K, value: PlannerInput[K]) => setDraft(previous => ({ ...previous, [key]: value }));
-  const openDay = (date: string) => { setSelected(date); sheetRef.current?.showModal(); };
-  const updateDay = (patch: Partial<DayPlan>) => selected && setPlans(previous => ({ ...previous, [selected]: { ...(previous[selected] ?? { value: "unset" }), ...patch } }));
-  const exportIcs = () => download(new Blob([createIcs(result.days, input.planName)], { type: "text/calendar;charset=utf-8" }), "rank-plan.ics");
-  const exportPng = (month: string) => {
-    const days = result.days.filter(day => day.date.startsWith(month)); const canvas = document.createElement("canvas"); canvas.width = 1200; canvas.height = 900; const ctx = canvas.getContext("2d"); if (!ctx) return;
-    ctx.fillStyle = "#FFFDFE"; ctx.fillRect(0, 0, 1200, 900); ctx.fillStyle = "#333"; ctx.font = "700 48px sans-serif"; ctx.fillText(`${input.planName || "ランク計画"}  ${month.replace("-", "年")}月`, 64, 78);
-    ctx.font = "24px sans-serif"; ["日", "月", "火", "水", "木", "金", "土"].forEach((label, i) => ctx.fillText(label, 86 + i * 154, 132));
-    const first = parseDate(`${month}-01`).getDay(); days.forEach(day => { const date = parseDate(day.date), cell = first + date.getDate() - 1, x = 54 + (cell % 7) * 154, y = 160 + Math.floor(cell / 7) * 126; ctx.fillStyle = "#FFF5F8"; ctx.beginPath(); ctx.roundRect(x, y, 138, 110, 18); ctx.fill(); ctx.fillStyle = "#333"; ctx.font = "22px sans-serif"; ctx.fillText(String(date.getDate()), x + 12, y + 28); ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68"; ctx.font = "700 25px sans-serif"; ctx.fillText(labelPlan(day.plan.value), x + 12, y + 62); if (day.rankEvent) { ctx.fillStyle = "#555"; ctx.font = "16px sans-serif"; ctx.fillText(day.rankEvent.type === "up" ? "ランクUP" : day.rankEvent.type === "keep" ? "キープ" : "ランクDOWN", x + 12, y + 91); } });
-    canvas.toBlob(blob => blob && download(blob, `rank-plan-${month}.png`), "image/png");
+  const nextRankDecision = getNextRankDecision(result.days);
+  const actionErrors = getActionErrors(result.warnings);
+  const rankProgress = getRankProgress(current?.scoreBefore ?? 0);
+  const updateDraft = <K extends keyof PlannerInput>(
+    key: K,
+    value: PlannerInput[K],
+  ) => setDraft((previous) => ({ ...previous, [key]: value }));
+  const openDay = (date: string) => {
+    setSelected(date);
+    sheetRef.current?.showModal();
   };
-  if (!started) return <section className="planner-shell"><div className="tool-intro"><span className="eyebrow">unofficial rank planner</span><h1>ランク計画カレンダー</h1><p>いまの状態を入力して、3か月先までのランク推移を組み立てます。</p></div><form className="setup-card" onSubmit={event => { event.preventDefault(); setInput(draft); setStarted(true); }}><h2>現在の状態</h2><div className="form-grid"><label>基準日<input type="date" required value={draft.baseDate} onChange={e => updateDraft("baseDate", e.target.value)} /></label><label>現在ランク<select value={draft.rank} onChange={e => updateDraft("rank", e.target.value as PlannerInput["rank"])}>{RANKS.map(rank => <option key={rank}>{rank}</option>)}</select></label><label>累計スコア<input type="number" min="0" max="17" required value={draft.score} onChange={e => updateDraft("score", Number(e.target.value))} /></label><label>IRIAM表示「あとN日」<input type="number" min="0" max="6" required value={draft.remainingDaysDisplay} onChange={e => updateDraft("remainingDaysDisplay", Number(e.target.value))} /></label><label>スキップパス<input type="number" min="0" max="10" required value={draft.skipPasses} onChange={e => updateDraft("skipPasses", Number(e.target.value))} /></label><label>デビュー日（任意）<input type="date" value={draft.debutDate ?? ""} onChange={e => updateDraft("debutDate", e.target.value || undefined)} /></label><label>計画名（任意）<input maxLength={30} value={draft.planName ?? ""} onChange={e => updateDraft("planName", e.target.value)} placeholder="夏のランク計画" /></label><label>表示名（任意）<input maxLength={30} value={draft.displayName ?? ""} onChange={e => updateDraft("displayName", e.target.value)} /></label></div><button className="button primary-wide" type="submit">3か月の計画を作る</button></form><Disclaimer /></section>;
-  const selectedPlan = selected ? plans[selected] ?? { value: "unset" as const } : undefined; const selectedDay = selected ? result.days.find(day => day.date === selected) : undefined; const selectedAnniversaries = selected ? anniversaryMap[selected] ?? [] : [];
-  return <section className="planner-shell"><div className="planner-title"><div><span className="eyebrow">rank plan</span><h1>{input.planName || "ランク計画カレンダー"}</h1><p>{input.displayName ? `${input.displayName}さんの` : ""}3か月シミュレーション</p></div><button className="text-button" onClick={() => { setDraft(input); setStarted(false); }}>初期設定を変更</button></div><div className="status-strip"><div><span>現在ランク</span><strong>{current?.rankBefore}</strong></div><div><span>累計</span><strong>{current?.scoreBefore}点</strong></div><div><span>スキパ</span><strong>{current?.skipPasses}枚</strong></div><div><span>警告</span><strong>{result.warnings.length}件</strong></div></div>{result.warnings.length > 0 && <aside className="warnings"><h2>確認ポイント</h2>{result.warnings.slice(0, 5).map((warning, i) => <p className={warning.level} key={`${warning.date}-${i}`}><b>{warning.level === "error" ? "ERROR" : "WARNING"}</b> {warning.date && `${warning.date}：`}{warning.message}</p>)}</aside>}<div className="planner-layout"><div className="calendar-stack">{months.map(([month, monthDays]) => monthDays && <MonthCalendar key={month} month={month} days={monthDays} anniversaries={anniversaryMap} onDay={openDay} onPng={() => exportPng(month)} />)}</div><aside className="planner-side"><h2>書き出し</h2><p>予定を終日イベントとしてカレンダーへ追加できます。</p><button className="button" onClick={exportIcs}>ICSを保存</button><h2>見かた</h2><ul className="legend"><li><i className="plan6" />スコア予定</li><li><i className="skip" />SKIP</li><li><i className="anniversary" />記念日</li><li><i className="grant" />スキパ付与</li></ul></aside></div><dialog className="day-sheet" ref={sheetRef} onClick={e => { if (e.target === sheetRef.current) sheetRef.current.close(); }}><div><header><div><span className="eyebrow">day plan</span><h2>{selected && new Intl.DateTimeFormat("ja-JP", { month: "long", day: "numeric", weekday: "short" }).format(parseDate(selected))}</h2></div><button aria-label="閉じる" className="close" onClick={() => sheetRef.current?.close()}>×</button></header><div className="value-picker">{values.map(item => <button key={String(item.value)} className={`value-${item.value} ${selectedPlan?.value === item.value ? "active" : ""}`} onClick={() => updateDay({ value: item.value })}>{item.label}</button>)}</div><label>メモ<textarea maxLength={50} value={selectedPlan?.memo ?? ""} onChange={e => updateDay({ memo: e.target.value })} placeholder="50文字まで" /></label>{selected && parseDate(selected).getDay() === 1 && <label className="toggle"><input type="checkbox" checked={selectedPlan?.weeklyGrant ?? true} onChange={e => updateDay({ weeklyGrant: e.target.checked })} />月曜の週次スキパ付与を予定する</label>}<div className="form-grid"><label>臨時スキパ付与<input type="number" min="0" value={selectedPlan?.manualGrant ?? 0} onChange={e => updateDay({ manualGrant: Number(e.target.value) })} /></label><label>付与メモ<input maxLength={50} value={selectedPlan?.manualGrantMemo ?? ""} onChange={e => updateDay({ manualGrantMemo: e.target.value })} /></label></div>{selectedDay && <p className="day-result">計算後：{selectedDay.rankAfter} / {selectedDay.scoreAfter}点 / スキパ{selectedDay.skipPasses}枚</p>}{selectedAnniversaries.map(item => <p className="anniversary-detail" key={item.label}>{item.label}</p>)}<button className="button primary-wide" onClick={() => sheetRef.current?.close()}>保存して閉じる</button></div></dialog><Disclaimer /></section>;
+  const updateDay = (patch: Partial<DayPlan>) =>
+    selected &&
+    setPlans((previous) => ({
+      ...previous,
+      [selected]: { ...(previous[selected] ?? { value: "unset" }), ...patch },
+    }));
+  const exportIcs = () =>
+    download(
+      new Blob([createIcs(result.days, input.planName)], {
+        type: "text/calendar;charset=utf-8",
+      }),
+      "rank-plan.ics",
+    );
+  const exportPng = (month: string) => {
+    const days = result.days.filter((day) => day.date.startsWith(month));
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 900;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#FFFDFE";
+    ctx.fillRect(0, 0, 1200, 900);
+    ctx.fillStyle = "#333";
+    ctx.font = "700 48px sans-serif";
+    ctx.fillText(
+      `${input.planName || "ランク計画"}  ${month.replace("-", "年")}月`,
+      64,
+      78,
+    );
+    ctx.font = "24px sans-serif";
+    ["日", "月", "火", "水", "木", "金", "土"].forEach((label, i) =>
+      ctx.fillText(label, 86 + i * 154, 132),
+    );
+    const first = parseDate(`${month}-01`).getDay();
+    days.forEach((day) => {
+      const date = parseDate(day.date),
+        cell = first + date.getDate() - 1,
+        x = 54 + (cell % 7) * 154,
+        y = 160 + Math.floor(cell / 7) * 126;
+      ctx.fillStyle = "#FFF5F8";
+      ctx.beginPath();
+      ctx.roundRect(x, y, 138, 110, 18);
+      ctx.fill();
+      ctx.fillStyle = "#333";
+      ctx.font = "22px sans-serif";
+      ctx.fillText(String(date.getDate()), x + 12, y + 28);
+      ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68";
+      ctx.font = "700 25px sans-serif";
+      ctx.fillText(labelPlan(day.plan.value), x + 12, y + 62);
+      if (day.rankEvent) {
+        ctx.fillStyle = "#555";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(
+          day.rankEvent.type === "up"
+            ? "ランクUP"
+            : day.rankEvent.type === "keep"
+              ? "キープ"
+              : "ランクDOWN",
+          x + 12,
+          y + 91,
+        );
+      }
+    });
+    canvas.toBlob(
+      (blob) => blob && download(blob, `rank-plan-${month}.png`),
+      "image/png",
+    );
+  };
+  if (!started)
+    return (
+      <section className="planner-shell">
+        <div className="tool-intro">
+          <span className="eyebrow">unofficial rank planner</span>
+          <h1>ランク計画カレンダー</h1>
+          <p>いまの状態を入力して、3か月先までのランク推移を組み立てます。</p>
+        </div>
+        <form
+          className="setup-card"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setInput(draft);
+            setStarted(true);
+          }}
+        >
+          <h2>現在の状態</h2>
+          <div className="form-grid">
+            <label>
+              基準日
+              <input
+                type="date"
+                required
+                value={draft.baseDate}
+                onChange={(e) => updateDraft("baseDate", e.target.value)}
+              />
+            </label>
+            <label>
+              現在ランク
+              <select
+                value={draft.rank}
+                onChange={(e) =>
+                  updateDraft("rank", e.target.value as PlannerInput["rank"])
+                }
+              >
+                {RANKS.map((rank) => (
+                  <option key={rank}>{rank}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              累計スコア
+              <input
+                type="number"
+                min="0"
+                max="17"
+                required
+                value={draft.score}
+                onChange={(e) => updateDraft("score", Number(e.target.value))}
+              />
+            </label>
+            <label>
+              IRIAM表示「あとN日」
+              <input
+                type="number"
+                min="0"
+                max="6"
+                required
+                value={draft.remainingDaysDisplay}
+                onChange={(e) =>
+                  updateDraft("remainingDaysDisplay", Number(e.target.value))
+                }
+              />
+            </label>
+            <label>
+              スキップパス
+              <input
+                type="number"
+                min="0"
+                max="10"
+                required
+                value={draft.skipPasses}
+                onChange={(e) =>
+                  updateDraft("skipPasses", Number(e.target.value))
+                }
+              />
+            </label>
+            <label>
+              デビュー日（任意）
+              <input
+                type="date"
+                value={draft.debutDate ?? ""}
+                onChange={(e) =>
+                  updateDraft("debutDate", e.target.value || undefined)
+                }
+              />
+            </label>
+            <label>
+              計画名（任意）
+              <input
+                maxLength={30}
+                value={draft.planName ?? ""}
+                onChange={(e) => updateDraft("planName", e.target.value)}
+                placeholder="夏のランク計画"
+              />
+            </label>
+            <label>
+              表示名（任意）
+              <input
+                maxLength={30}
+                value={draft.displayName ?? ""}
+                onChange={(e) => updateDraft("displayName", e.target.value)}
+              />
+            </label>
+          </div>
+          <button className="button primary-wide" type="submit">
+            3か月の計画を作る
+          </button>
+        </form>
+        <Disclaimer />
+      </section>
+    );
+  const selectedPlan = selected
+    ? (plans[selected] ?? { value: "unset" as const })
+    : undefined;
+  const selectedDay = selected
+    ? result.days.find((day) => day.date === selected)
+    : undefined;
+  const selectedAnniversaries = selected
+    ? (anniversaryMap[selected] ?? [])
+    : [];
+  return (
+    <section className="planner-shell">
+      <div className="planner-title">
+        <div>
+          <span className="eyebrow">rank plan</span>
+          <h1>{input.planName || "ランク計画カレンダー"}</h1>
+          <p>
+            {input.displayName ? `${input.displayName}さんの` : ""}
+            3か月シミュレーション
+          </p>
+        </div>
+        <button
+          className="text-button"
+          onClick={() => {
+            setDraft(input);
+            setStarted(false);
+          }}
+        >
+          初期設定を変更
+        </button>
+      </div>
+      <div className="current-rank-card">
+        <div className="current-rank-main">
+          <span>現在ランク</span>
+          <strong>{current?.rankBefore}</strong>
+          <p>
+            累計スコア <b>{rankProgress.currentScore} / 18</b>
+          </p>
+        </div>
+        <div className="rank-goals">
+          <div className="keep-goal">
+            <span>ランクキープ</span>
+            <strong>{rankProgress.keepAchieved ? "達成" : `あと +${rankProgress.keepRemaining}`}</strong>
+          </div>
+          <div className="up-goal">
+            <span>ランクアップ</span>
+            <strong>あと +{rankProgress.upRemaining}</strong>
+          </div>
+        </div>
+        <p className="current-skip-passes">スキパ {current?.skipPasses}枚</p>
+      </div>
+      {nextRankDecision?.rankEvent && (
+        <aside className={`next-decision ${nextRankDecision.rankEvent.type}`}>
+          <span>
+            次のランク判定：
+            {new Intl.DateTimeFormat("ja-JP", {
+              month: "long",
+              day: "numeric",
+            }).format(parseDate(nextRankDecision.date))}
+          </span>
+          <strong>予測：{nextRankDecision.rankEvent.label}</strong>
+        </aside>
+      )}
+      {actionErrors.length > 0 && (
+        <aside className="warnings">
+          <h2>操作を確認してください</h2>
+          {actionErrors.map((warning, i) => (
+            <p className="error" key={`${warning.date}-${i}`}>
+              <b>ERROR</b>{" "}
+              {warning.date && `${warning.date}：`}
+              {warning.message}
+            </p>
+          ))}
+        </aside>
+      )}
+      <div className="planner-layout">
+        <div className="calendar-stack">
+          {months.map(
+            ([month, monthDays]) =>
+              monthDays && (
+                <MonthCalendar
+                  key={month}
+                  month={month}
+                  days={monthDays}
+                  anniversaries={anniversaryMap}
+                  onDay={openDay}
+                  onPng={() => exportPng(month)}
+                />
+              ),
+          )}
+        </div>
+        <aside className="planner-side">
+          <h2>書き出し</h2>
+          <p>予定を終日イベントとしてカレンダーへ追加できます。</p>
+          <button className="button" onClick={exportIcs}>
+            ICSを保存
+          </button>
+          <h2>見かた</h2>
+          <ul className="legend">
+            <li>
+              <i className="plan6" />
+              スコア予定
+            </li>
+            <li>
+              <i className="skip" />
+              SKIP
+            </li>
+            <li>
+              <i className="anniversary" />
+              記念日
+            </li>
+            <li>
+              <i className="grant" />
+              スキパ付与
+            </li>
+          </ul>
+        </aside>
+      </div>
+      <dialog
+        className="day-sheet"
+        ref={sheetRef}
+        onClick={(e) => {
+          if (e.target === sheetRef.current) sheetRef.current.close();
+        }}
+      >
+        <div>
+          <header>
+            <div>
+              <span className="eyebrow">day plan</span>
+              <h2>
+                {selected &&
+                  new Intl.DateTimeFormat("ja-JP", {
+                    month: "long",
+                    day: "numeric",
+                    weekday: "short",
+                  }).format(parseDate(selected))}
+              </h2>
+            </div>
+            <button
+              aria-label="閉じる"
+              className="close"
+              onClick={() => sheetRef.current?.close()}
+            >
+              ×
+            </button>
+          </header>
+          <div className="value-picker">
+            {values.map((item) => (
+              <button
+                key={String(item.value)}
+                className={`value-${item.value} ${selectedPlan?.value === item.value ? "active" : ""}`}
+                onClick={() => updateDay({ value: item.value })}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <label>
+            メモ
+            <textarea
+              maxLength={50}
+              value={selectedPlan?.memo ?? ""}
+              onChange={(e) => updateDay({ memo: e.target.value })}
+              placeholder="50文字まで"
+            />
+          </label>
+          {selected && parseDate(selected).getDay() === 1 && (
+            <label className="weekly-grant-setting">
+              <span>
+                <b>週次スキパ付与</b>
+                <small>月曜日の付与予定を計算に含めます</small>
+              </span>
+              <input
+                type="checkbox"
+                checked={selectedPlan?.weeklyGrant ?? true}
+                onChange={(e) => updateDay({ weeklyGrant: e.target.checked })}
+                aria-label="月曜の週次スキパ付与を予定する"
+              />
+            </label>
+          )}
+          <div className="form-grid manual-grant-fields">
+            <label>
+              臨時スキパ付与
+              <input
+                type="number"
+                min="0"
+                value={selectedPlan?.manualGrant ?? 0}
+                onChange={(e) =>
+                  updateDay({ manualGrant: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label>
+              付与メモ
+              <input
+                maxLength={50}
+                value={selectedPlan?.manualGrantMemo ?? ""}
+                onChange={(e) => updateDay({ manualGrantMemo: e.target.value })}
+              />
+            </label>
+          </div>
+          {selectedDay && (
+            <p className="day-result">
+              計算後：{selectedDay.rankAfter} / {selectedDay.scoreAfter}点 /
+              スキパ{selectedDay.skipPasses}枚
+            </p>
+          )}
+          {selectedAnniversaries.map((item) => (
+            <p className="anniversary-detail" key={item.label}>
+              {item.label}
+            </p>
+          ))}
+          <button
+            className="button primary-wide"
+            onClick={() => sheetRef.current?.close()}
+          >
+            保存して閉じる
+          </button>
+        </div>
+      </dialog>
+      <Disclaimer />
+    </section>
+  );
 }
 
-function MonthCalendar({ month, days, anniversaries, onDay, onPng }: { month: string; days: ReturnType<typeof simulate>["days"]; anniversaries: Partial<Record<string, ReturnType<typeof generateAnniversaries>>>; onDay: (date: string) => void; onPng: () => void }) {
-  const first = parseDate(`${month}-01`).getDay(); const cells = [...Array(first).fill(null), ...days];
-  return <article className="month-card"><header><h2>{month.replace("-", "年")}月</h2><button className="text-button" onClick={onPng}>この月をPNG保存</button></header><div className="weekdays">{["日", "月", "火", "水", "木", "金", "土"].map(day => <span key={day}>{day}</span>)}</div><div className="month-grid">{cells.map((day, index) => day ? <button className={`day-cell ${day.rankEvent?.type ?? ""}`} key={day.date} onClick={() => onDay(day.date)}><span className="day-number">{parseDate(day.date).getDate()}</span>{day.plan.value !== "unset" && <b className={`chip value-${day.plan.value}`}>{labelPlan(day.plan.value)}</b>}{day.weeklyGrant > 0 && <small className="grant-chip">スキパ +1</small>}{day.manualGrant > 0 && <small className="grant-chip">スキパ +{day.manualGrant}</small>}{anniversaries[day.date]?.map(event => <small className="anniversary-chip" key={event.label}>{event.label}</small>)}{day.rankEvent && <small className={`rank-chip ${day.rankEvent.type}`}>{day.rankEvent.type === "up" ? "ランクUP" : day.rankEvent.type === "keep" ? "キープ" : "ランクDOWN"}</small>}{day.plan.memo && <small className="memo">{day.plan.memo}</small>}</button> : <span className="day-cell empty" key={`empty-${index}`} />)}</div></article>;
+function MonthCalendar({
+  month,
+  days,
+  anniversaries,
+  onDay,
+  onPng,
+}: {
+  month: string;
+  days: ReturnType<typeof simulate>["days"];
+  anniversaries: Partial<
+    Record<string, ReturnType<typeof generateAnniversaries>>
+  >;
+  onDay: (date: string) => void;
+  onPng: () => void;
+}) {
+  const first = parseDate(`${month}-01`).getDay();
+  const cells = [...Array(first).fill(null), ...days];
+  return (
+    <article className="month-card">
+      <header>
+        <h2>{month.replace("-", "年")}月</h2>
+        <button className="text-button" onClick={onPng}>
+          この月をPNG保存
+        </button>
+      </header>
+      <div className="weekdays">
+        {["日", "月", "火", "水", "木", "金", "土"].map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
+      <div className="month-grid">
+        {cells.map((day, index) =>
+          day ? (
+            <button
+              className={`day-cell ${day.rankEvent?.type ?? ""}`}
+              key={day.date}
+              onClick={() => onDay(day.date)}
+            >
+              <span className="day-number">
+                {parseDate(day.date).getDate()}
+              </span>
+              <b className="daily-rank-chip">{day.rankBefore}</b>
+              {day.plan.value !== "unset" && (
+                <b className={`chip value-${day.plan.value}`}>
+                  {labelPlan(day.plan.value)}
+                </b>
+              )}
+              {day.weeklyGrant > 0 && (
+                <small className="grant-chip">スキパ +1</small>
+              )}
+              {day.manualGrant > 0 && (
+                <small className="grant-chip">スキパ +{day.manualGrant}</small>
+              )}
+              {anniversaries[day.date]?.map((event) => (
+                <small className="anniversary-chip" key={event.label}>
+                  {event.label}
+                </small>
+              ))}
+              {day.rankEvent && (
+                <small className={`rank-chip ${day.rankEvent.type}`}>
+                  {day.rankEvent.type === "up"
+                    ? "ランクUP"
+                    : day.rankEvent.type === "keep"
+                      ? "キープ"
+                      : "ランクDOWN"}
+                </small>
+              )}
+              {day.plan.memo && <small className="memo">{day.plan.memo}</small>}
+            </button>
+          ) : (
+            <span className="day-cell empty" key={`empty-${index}`} />
+          ),
+        )}
+      </div>
+    </article>
+  );
 }
-function Disclaimer() { return <p className="disclaimer">本サービスはIRIAMの非公式ツールであり、IRIAM運営会社とは関係ありません。計算結果は入力された予定値に基づくシミュレーションです。実際のランク変動はIRIAM公式表示をご確認ください。</p>; }
+function Disclaimer() {
+  return (
+    <p className="disclaimer">
+      本サービスはIRIAMの非公式ツールであり、IRIAM運営会社とは関係ありません。計算結果は入力された予定値に基づくシミュレーションです。実際のランク変動はIRIAM公式表示をご確認ください。
+    </p>
+  );
+}
