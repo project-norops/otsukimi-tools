@@ -11,6 +11,7 @@ import { generateAnniversaries } from "@/lib/anniversaries";
 import { createIcs } from "@/lib/ics";
 import { addDays, formatDate, parseDate } from "@/lib/date-utils";
 import { getActionErrors, getNextRankDecision, getRankProgress } from "@/lib/planner-view";
+import { shareOrDownloadCalendar } from "@/lib/calendar-share";
 
 const values: { value: PlanValue; label: string }[] = [
   { value: 6, label: "+6" },
@@ -45,6 +46,7 @@ export function RankPlanner() {
   const [started, setStarted] = useState(false);
   const [plans, setPlans] = useState<Record<string, DayPlan>>({});
   const [selected, setSelected] = useState<string>();
+  const [exportNotice, setExportNotice] = useState<string>();
   const sheetRef = useRef<HTMLDialogElement>(null);
   const result = useMemo(() => simulate(input, plans), [input, plans]);
   const anniversaries = useMemo(
@@ -87,13 +89,30 @@ export function RankPlanner() {
       ...previous,
       [selected]: { ...(previous[selected] ?? { value: "unset" }), ...patch },
     }));
-  const exportIcs = () =>
-    download(
-      new Blob([createIcs(result.days, input.planName)], {
-        type: "text/calendar;charset=utf-8",
-      }),
+  const addToCalendar = async () => {
+    setExportNotice(undefined);
+    const file = new File(
+      [createIcs(result.days, input.planName)],
       "rank-plan.ics",
+      { type: "text/calendar;charset=utf-8" },
     );
+    try {
+      const outcome = await shareOrDownloadCalendar(file, navigator, () =>
+        download(file, file.name),
+      );
+      if (outcome === "downloaded") {
+        setExportNotice(
+          "カレンダーファイルを保存しました。ファイルを開いて、お使いのカレンダーへ追加してください。",
+        );
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      download(file, file.name);
+      setExportNotice(
+        "カレンダーファイルを保存しました。ファイルを開いて、お使いのカレンダーへ追加してください。",
+      );
+    }
+  };
   const exportPng = (month: string) => {
     const days = result.days.filter((day) => day.date.startsWith(month));
     const canvas = document.createElement("canvas");
@@ -352,11 +371,23 @@ export function RankPlanner() {
           )}
         </div>
         <aside className="planner-side">
-          <h2>書き出し</h2>
-          <p>予定を終日イベントとしてカレンダーへ追加できます。</p>
-          <button className="button" onClick={exportIcs}>
-            ICSを保存
+          <h2>カレンダー連携</h2>
+          <p>予定を終日イベントとして端末のカレンダーへ追加できます。</p>
+          <button
+            className="button calendar-share-button"
+            onClick={addToCalendar}
+          >
+            カレンダーに追加
           </button>
+          {exportNotice && (
+            <p className="export-notice" role="status">
+              {exportNotice}
+            </p>
+          )}
+          <div className="image-export-note">
+            <b>画像で共有</b>
+            <span>各月の「この月をPNG保存」を使ってください。</span>
+          </div>
           <h2>見かた</h2>
           <ul className="legend">
             <li>

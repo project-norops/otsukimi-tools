@@ -1,10 +1,10 @@
 # Build Progress
 
-- Current status: Mobile UI fixes and rank progress enhancements complete, pushed, and deployed to Vercel Preview
-- Completed: Next.js scaffold; centralized rules and 3-month simulator; metadata-driven portal; planner and exports; PWA; mobile bottom-sheet weekly grant setting fix; daily start-of-day rank chips; nearest rank-decision summary; simplified action errors; current rank and keep/up progress cards; 18 unit tests
-- In progress: None
-- Next: Human review at 375px on the updated Preview URL
-- Tests: `npm run check` passed (18/18 unit tests, typecheck, lint, production build); 375px mobile constraints reviewed in CSS (`min-width`, fixed checkbox width, `88dvh` scroll area, single-column manual grants)
+- Current status: Mobile width/overflow and calendar sharing fixes complete; commit, push, and Vercel verification in progress
+- Completed: Existing MVP; mobile bottom-sheet fix; daily rank chips and rank progress; viewport-safe shrinkable grid/flex layout; 320/375/390/430px CSS regression guards; user-facing calendar add action with Web Share file support and download fallback
+- In progress: Commit, push, and updated Preview verification
+- Next: Confirm the updated Preview is READY and review on physical iPhone
+- Tests: `npm run check` passed (26/26 unit tests, typecheck, lint, production build); local `/`, `/liver`, `/listener`, `/tools/rank-calendar` all returned HTTP 200
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)
