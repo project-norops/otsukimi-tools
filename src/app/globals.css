@@ -433,6 +433,7 @@ textarea {
 .month-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  position: relative;
 }
 .weekdays span {
   text-align: center;
@@ -472,18 +473,43 @@ textarea {
 .day-number {
   font-size: 12px;
   font-weight: 800;
+  margin-bottom: 20px;
 }
-.daily-rank-chip {
-  min-width: 28px;
-  padding: 2px 6px;
-  color: #9b4963;
-  background: #fff0f5;
-  border: 1px solid #f1d7e0;
-  border-radius: 999px;
+.rank-period-band {
+  align-self: start;
+  z-index: 2;
+  height: 17px;
+  margin: 27px 3px 0;
+  padding: 1px 8px;
+  background: #f9dce5;
+  border: 1px solid #efc9d6;
+  color: #8f3e59;
   font-size: 9px;
-  line-height: 1.25;
+  font-weight: 900;
+  line-height: 13px;
   text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rank-period-band.starts {
+  border-radius: 999px 4px 4px 999px;
+}
+.rank-period-band.ends {
+  border-radius: 4px 999px 999px 4px;
+}
+.rank-period-band.starts.ends {
+  border-radius: 999px;
+}
+.rank-period-band.continues-before {
+  margin-left: 0;
+  border-left-color: #dfafbf;
+  border-left-style: dashed;
+}
+.rank-period-band.continues-after {
+  margin-right: 0;
+  border-right-color: #dfafbf;
+  border-right-style: dashed;
 }
 .chip,
 .grant-chip,

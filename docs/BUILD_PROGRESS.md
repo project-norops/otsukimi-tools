@@ -1,10 +1,10 @@
 # Build Progress
 
-- Current status: Mobile width/overflow and calendar sharing fixes complete, pushed, and deployed to Vercel Preview
-- Completed: Existing MVP; mobile bottom-sheet fix; daily rank chips and rank progress; viewport-safe shrinkable grid/flex layout; 320/375/390/430px CSS regression guards; user-facing calendar add action with Web Share file support and download fallback
-- In progress: None
-- Next: Review the updated Preview on physical iPhone at 320–430px widths
-- Tests: `npm run check` passed (26/26 unit tests, typecheck, lint, production build); local `/`, `/liver`, `/listener`, `/tools/rank-calendar` all returned HTTP 200
+- Current status: Cross-cell rank period bands complete; commit, push, and Preview verification in progress
+- Completed: Existing MVP and mobile fixes; daily rank chips replaced by cross-cell rank period bands; rank bands split on rank changes, week boundaries, and month boundaries; continuation edge styling; matching PNG band rendering
+- In progress: Commit, push, and updated Preview verification
+- Next: Confirm rank period bands on the updated mobile Preview
+- Tests: `npm run check` passed (29/29 unit tests, typecheck, lint, production build); rank change/week crossing/month crossing band tests pass; local `/`, `/liver`, `/listener`, `/tools/rank-calendar` all returned HTTP 200
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)

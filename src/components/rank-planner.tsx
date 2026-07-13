@@ -12,6 +12,7 @@ import { createIcs } from "@/lib/ics";
 import { addDays, formatDate, parseDate } from "@/lib/date-utils";
 import { getActionErrors, getNextRankDecision, getRankProgress } from "@/lib/planner-view";
 import { shareOrDownloadCalendar } from "@/lib/calendar-share";
+import { createRankBandSegments, type RankBandSegment } from "@/lib/rank-bands";
 
 const values: { value: PlanValue; label: string }[] = [
   { value: 6, label: "+6" },
@@ -75,6 +76,7 @@ export function RankPlanner() {
   const nextRankDecision = getNextRankDecision(result.days);
   const actionErrors = getActionErrors(result.warnings);
   const rankProgress = getRankProgress(current?.scoreBefore ?? 0);
+  const rankBands = useMemo(() => createRankBandSegments(result.days), [result.days]);
   const updateDraft = <K extends keyof PlannerInput>(
     key: K,
     value: PlannerInput[K],
@@ -146,9 +148,29 @@ export function RankPlanner() {
       ctx.fillStyle = "#333";
       ctx.font = "22px sans-serif";
       ctx.fillText(String(date.getDate()), x + 12, y + 28);
+    });
+    rankBands.filter((band) => band.month === month).forEach((band) => {
+      const x = 54 + (band.startColumn - 1) * 154;
+      const y = 160 + (band.row - 1) * 126 + 35;
+      const width = band.span * 154 - 16;
+      ctx.fillStyle = "#FADBE5";
+      ctx.beginPath();
+      ctx.roundRect(x, y, width, 20, band.continuesBefore || band.continuesAfter ? 5 : 10);
+      ctx.fill();
+      ctx.fillStyle = "#8F3E59";
+      ctx.font = "700 14px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(band.rank, x + width / 2, y + 15);
+      ctx.textAlign = "left";
+    });
+    days.forEach((day) => {
+      const date = parseDate(day.date),
+        cell = first + date.getDate() - 1,
+        x = 54 + (cell % 7) * 154,
+        y = 160 + Math.floor(cell / 7) * 126;
       ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68";
       ctx.font = "700 25px sans-serif";
-      ctx.fillText(labelPlan(day.plan.value), x + 12, y + 62);
+      ctx.fillText(labelPlan(day.plan.value), x + 12, y + 82);
       if (day.rankEvent) {
         ctx.fillStyle = "#555";
         ctx.font = "16px sans-serif";
@@ -159,7 +181,7 @@ export function RankPlanner() {
               ? "キープ"
               : "ランクDOWN",
           x + 12,
-          y + 91,
+          y + 105,
         );
       }
     });
@@ -363,6 +385,7 @@ export function RankPlanner() {
                   key={month}
                   month={month}
                   days={monthDays}
+                  rankBands={rankBands.filter((band) => band.month === month)}
                   anniversaries={anniversaryMap}
                   onDay={openDay}
                   onPng={() => exportPng(month)}
@@ -519,12 +542,14 @@ export function RankPlanner() {
 function MonthCalendar({
   month,
   days,
+  rankBands,
   anniversaries,
   onDay,
   onPng,
 }: {
   month: string;
   days: ReturnType<typeof simulate>["days"];
+  rankBands: RankBandSegment[];
   anniversaries: Partial<
     Record<string, ReturnType<typeof generateAnniversaries>>
   >;
@@ -532,7 +557,6 @@ function MonthCalendar({
   onPng: () => void;
 }) {
   const first = parseDate(`${month}-01`).getDay();
-  const cells = [...Array(first).fill(null), ...days];
   return (
     <article className="month-card">
       <header>
@@ -547,17 +571,18 @@ function MonthCalendar({
         ))}
       </div>
       <div className="month-grid">
-        {cells.map((day, index) =>
-          day ? (
+        {days.map((day) => {
+          const cell = first + parseDate(day.date).getDate() - 1;
+          return (
             <button
               className={`day-cell ${day.rankEvent?.type ?? ""}`}
+              style={{ gridColumn: (cell % 7) + 1, gridRow: Math.floor(cell / 7) + 1 }}
               key={day.date}
               onClick={() => onDay(day.date)}
             >
               <span className="day-number">
                 {parseDate(day.date).getDate()}
               </span>
-              <b className="daily-rank-chip">{day.rankBefore}</b>
               {day.plan.value !== "unset" && (
                 <b className={`chip value-${day.plan.value}`}>
                   {labelPlan(day.plan.value)}
@@ -585,10 +610,17 @@ function MonthCalendar({
               )}
               {day.plan.memo && <small className="memo">{day.plan.memo}</small>}
             </button>
-          ) : (
-            <span className="day-cell empty" key={`empty-${index}`} />
-          ),
-        )}
+          );
+        })}
+        {rankBands.map((band) => (
+          <div
+            className={`rank-period-band ${band.continuesBefore ? "continues-before" : "starts"} ${band.continuesAfter ? "continues-after" : "ends"}`}
+            style={{ gridColumn: `${band.startColumn} / span ${band.span}`, gridRow: band.row }}
+            key={`${band.month}-${band.row}-${band.startColumn}-${band.rank}`}
+          >
+            <span>{band.rank}</span>
+          </div>
+        ))}
       </div>
     </article>
   );
