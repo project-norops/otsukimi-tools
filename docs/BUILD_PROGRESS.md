@@ -1,10 +1,10 @@
 # Build Progress
 
-- Current status: Bottom-sheet sticky action footer and decision-score display complete, pushed, and deployed to Vercel Preview
-- Completed: Existing MVP and QA fixes; skip grant memo removed from type and UI; scrollable sheet body with dvh/safe-area sticky footer; simulation now exposes pre-reset decision totals; decision days show total/result and next-period score separately
-- In progress: None
-- Next: Confirm sticky save action with a short viewport and on-screen keyboard on physical iPhone
-- Tests: `npm run check` passed (58/58 unit tests, typecheck, lint, production build); 18-point up, 12-point keep, 11-point down, and SKIP-extended decision total regressions pass
+- Current status: iOS WebKit input-focus zoom prevention complete and ready for commit/deployment
+- Completed: Existing MVP and QA fixes; skip grant memo removed from type and UI; scrollable sheet body with dvh/safe-area sticky footer; simulation decision totals; editable mobile `input` and `textarea` fields use a 16px font size to prevent focus zoom in iOS Safari/Chrome
+- In progress: Commit, push, and dedicated Vercel Preview verification
+- Next: Confirm memo focus behavior on physical iPhone in Safari and Chrome
+- Tests: `npm run check` passed (59/59 unit tests, typecheck, lint, production build); mobile CSS regression verifies editable `input` and `textarea` font size is at least 16px
 - Known issues: Automated visual browser review remains unavailable because no browser backend was present
 - Blockers: None
 - Vercel project: `otsukimi-tools` (`prj_sbH9SH1S7Vn8YiF7Ucf8mYL6iMIe`)
