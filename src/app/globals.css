@@ -312,9 +312,13 @@ textarea {
   font-weight: 800;
 }
 .current-rank-main > strong {
-  display: block;
+  display: inline-block;
   margin: 2px 0 4px;
-  color: #d83e68;
+  padding: 5px 13px;
+  color: var(--rank-text);
+  background: var(--rank-background);
+  border: 1px solid var(--rank-border);
+  border-radius: 14px;
   font-size: 42px;
   line-height: 1;
 }
@@ -441,6 +445,14 @@ textarea {
   font-size: 11px;
   color: var(--sub);
 }
+.weekdays .sunday,
+.day-number.sunday {
+  color: #d83e68;
+}
+.weekdays .saturday,
+.day-number.saturday {
+  color: #3986a8;
+}
 .day-cell {
   position: relative;
   display: flex;
@@ -481,9 +493,9 @@ textarea {
   height: 17px;
   margin: 27px 3px 0;
   padding: 1px 8px;
-  background: #f9dce5;
-  border: 1px solid #efc9d6;
-  color: #8f3e59;
+  background: var(--rank-background);
+  border: 1px solid var(--rank-border);
+  color: var(--rank-text);
   font-size: 9px;
   font-weight: 900;
   line-height: 13px;
@@ -503,12 +515,10 @@ textarea {
 }
 .rank-period-band.continues-before {
   margin-left: 0;
-  border-left-color: #dfafbf;
   border-left-style: dashed;
 }
 .rank-period-band.continues-after {
   margin-right: 0;
-  border-right-color: #dfafbf;
   border-right-style: dashed;
 }
 .chip,
@@ -539,6 +549,11 @@ textarea {
 .value-skip {
   background: var(--light-green) !important;
   color: #276837;
+}
+.chip.invalid {
+  background: #f1ecee !important;
+  color: #9a6874 !important;
+  text-decoration: line-through;
 }
 .value-rest {
   background: #eee !important;
@@ -740,12 +755,6 @@ textarea {
 }
 .empty {
   background: #fcfafb;
-}
-.day-cell:nth-child(7n + 1) .day-number {
-  color: #d83e68;
-}
-.day-cell:nth-child(7n) .day-number {
-  color: #3986a8;
 }
 @media (max-width: 800px) {
   main {

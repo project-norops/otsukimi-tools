@@ -1,5 +1,6 @@
 import type { Rank, SimulationDay } from "@/types/planner";
-import { addDays, parseDate } from "./date-utils";
+import { addDays } from "./date-utils";
+import { getCalendarCell } from "./calendar-display";
 
 export interface RankBandSegment {
   month: string;
@@ -12,10 +13,8 @@ export interface RankBandSegment {
 }
 
 const position = (date: string) => {
-  const parsed = parseDate(date);
-  const firstWeekday = new Date(parsed.getFullYear(), parsed.getMonth(), 1).getDay();
-  const cell = firstWeekday + parsed.getDate() - 1;
-  return { month: date.slice(0, 7), row: Math.floor(cell / 7) + 1, column: (cell % 7) + 1 };
+  const cell = getCalendarCell(date);
+  return { month: date.slice(0, 7), row: cell.row, column: cell.column };
 };
 
 export function createRankBandSegments(days: SimulationDay[]): RankBandSegment[] {

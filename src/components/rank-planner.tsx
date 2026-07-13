@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   RANKS,
   type DayPlan,
@@ -13,6 +13,8 @@ import { addDays, formatDate, parseDate } from "@/lib/date-utils";
 import { getActionErrors, getNextRankDecision, getRankProgress } from "@/lib/planner-view";
 import { shareOrDownloadCalendar } from "@/lib/calendar-share";
 import { createRankBandSegments, type RankBandSegment } from "@/lib/rank-bands";
+import { getRankPalette } from "@/lib/rank-colors";
+import { getCalendarCell, getWeekdayKind, WEEKDAY_COLORS, WEEKDAY_HEADERS } from "@/lib/calendar-display";
 
 const values: { value: PlanValue; label: string }[] = [
   { value: 6, label: "+6" },
@@ -25,6 +27,16 @@ const values: { value: PlanValue; label: string }[] = [
 ];
 const labelPlan = (value: PlanValue) =>
   values.find((item) => item.value === value)?.label ?? "";
+const numberOptions = (maximum: number) =>
+  Array.from({ length: maximum + 1 }, (_, value) => value);
+const rankColorStyle = (rank: (typeof RANKS)[number]) => {
+  const palette = getRankPalette(rank);
+  return {
+    "--rank-background": palette.background,
+    "--rank-text": palette.text,
+    "--rank-border": palette.border,
+  } as CSSProperties;
+};
 const today = formatDate(new Date());
 const download = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
@@ -132,9 +144,10 @@ export function RankPlanner() {
       78,
     );
     ctx.font = "24px sans-serif";
-    ["日", "月", "火", "水", "木", "金", "土"].forEach((label, i) =>
-      ctx.fillText(label, 86 + i * 154, 132),
-    );
+    WEEKDAY_HEADERS.forEach((item, index) => {
+      ctx.fillStyle = WEEKDAY_COLORS[item.kind];
+      ctx.fillText(item.label, 86 + index * 154, 132);
+    });
     const first = parseDate(`${month}-01`).getDay();
     days.forEach((day) => {
       const date = parseDate(day.date),
@@ -145,19 +158,23 @@ export function RankPlanner() {
       ctx.beginPath();
       ctx.roundRect(x, y, 138, 110, 18);
       ctx.fill();
-      ctx.fillStyle = "#333";
       ctx.font = "22px sans-serif";
+      ctx.fillStyle = WEEKDAY_COLORS[getWeekdayKind(day.date)];
       ctx.fillText(String(date.getDate()), x + 12, y + 28);
     });
     rankBands.filter((band) => band.month === month).forEach((band) => {
       const x = 54 + (band.startColumn - 1) * 154;
       const y = 160 + (band.row - 1) * 126 + 35;
       const width = band.span * 154 - 16;
-      ctx.fillStyle = "#FADBE5";
+      const palette = getRankPalette(band.rank);
+      ctx.fillStyle = palette.background;
       ctx.beginPath();
       ctx.roundRect(x, y, width, 20, band.continuesBefore || band.continuesAfter ? 5 : 10);
       ctx.fill();
-      ctx.fillStyle = "#8F3E59";
+      ctx.strokeStyle = palette.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = palette.text;
       ctx.font = "700 14px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(band.rank, x + width / 2, y + 15);
@@ -170,7 +187,7 @@ export function RankPlanner() {
         y = 160 + Math.floor(cell / 7) * 126;
       ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68";
       ctx.font = "700 25px sans-serif";
-      ctx.fillText(labelPlan(day.plan.value), x + 12, y + 82);
+      ctx.fillText(day.skipValid ? labelPlan(day.plan.value) : "SKIP不可", x + 12, y + 82);
       if (day.rankEvent) {
         ctx.fillStyle = "#555";
         ctx.font = "16px sans-serif";
@@ -232,40 +249,49 @@ export function RankPlanner() {
             </label>
             <label>
               累計スコア
-              <input
-                type="number"
-                min="0"
-                max="17"
+              <select
                 required
                 value={draft.score}
                 onChange={(e) => updateDraft("score", Number(e.target.value))}
-              />
+              >
+                {numberOptions(17).map((value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               IRIAM表示「あとN日」
-              <input
-                type="number"
-                min="0"
-                max="6"
+              <select
                 required
                 value={draft.remainingDaysDisplay}
                 onChange={(e) =>
                   updateDraft("remainingDaysDisplay", Number(e.target.value))
                 }
-              />
+              >
+                {numberOptions(6).map((value) => (
+                  <option value={value} key={value}>
+                    あと{value}日
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               スキップパス
-              <input
-                type="number"
-                min="0"
-                max="10"
+              <select
                 required
                 value={draft.skipPasses}
                 onChange={(e) =>
                   updateDraft("skipPasses", Number(e.target.value))
                 }
-              />
+              >
+                {numberOptions(10).map((value) => (
+                  <option value={value} key={value}>
+                    {value}枚
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               デビュー日（任意）
@@ -335,7 +361,12 @@ export function RankPlanner() {
       <div className="current-rank-card">
         <div className="current-rank-main">
           <span>現在ランク</span>
-          <strong>{current?.rankBefore}</strong>
+          <strong
+            className="current-rank-value"
+            style={current ? rankColorStyle(current.rankBefore) : undefined}
+          >
+            {current?.rankBefore}
+          </strong>
           <p>
             累計スコア <b>{rankProgress.currentScore} / 18</b>
           </p>
@@ -556,7 +587,6 @@ function MonthCalendar({
   onDay: (date: string) => void;
   onPng: () => void;
 }) {
-  const first = parseDate(`${month}-01`).getDay();
   return (
     <article className="month-card">
       <header>
@@ -566,25 +596,25 @@ function MonthCalendar({
         </button>
       </header>
       <div className="weekdays">
-        {["日", "月", "火", "水", "木", "金", "土"].map((day) => (
-          <span key={day}>{day}</span>
+        {WEEKDAY_HEADERS.map((day) => (
+          <span className={day.kind} key={day.label}>{day.label}</span>
         ))}
       </div>
       <div className="month-grid">
         {days.map((day) => {
-          const cell = first + parseDate(day.date).getDate() - 1;
+          const position = getCalendarCell(day.date);
           return (
             <button
               className={`day-cell ${day.rankEvent?.type ?? ""}`}
-              style={{ gridColumn: (cell % 7) + 1, gridRow: Math.floor(cell / 7) + 1 }}
+              style={{ gridColumn: position.column, gridRow: position.row }}
               key={day.date}
               onClick={() => onDay(day.date)}
             >
-              <span className="day-number">
+              <span className={`day-number ${getWeekdayKind(day.date)}`}>
                 {parseDate(day.date).getDate()}
               </span>
               {day.plan.value !== "unset" && (
-                <b className={`chip value-${day.plan.value}`}>
+                <b className={`chip value-${day.plan.value} ${day.skipValid ? "" : "invalid"}`}>
                   {labelPlan(day.plan.value)}
                 </b>
               )}
@@ -615,7 +645,7 @@ function MonthCalendar({
         {rankBands.map((band) => (
           <div
             className={`rank-period-band ${band.continuesBefore ? "continues-before" : "starts"} ${band.continuesAfter ? "continues-after" : "ends"}`}
-            style={{ gridColumn: `${band.startColumn} / span ${band.span}`, gridRow: band.row }}
+            style={{ ...rankColorStyle(band.rank), gridColumn: `${band.startColumn} / span ${band.span}`, gridRow: band.row }}
             key={`${band.month}-${band.row}-${band.startColumn}-${band.rank}`}
           >
             <span>{band.rank}</span>
