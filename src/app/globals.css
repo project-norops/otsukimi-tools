@@ -227,6 +227,8 @@ section > h1 {
   padding: 24px;
 }
 .setup-card {
+  width: 100%;
+  min-width: 0;
   max-width: 760px;
   margin: 30px auto;
 }
@@ -237,6 +239,11 @@ section > h1 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+.form-grid > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 label {
   display: grid;
@@ -255,6 +262,22 @@ textarea {
   background: #fff;
   padding: 10px 12px;
   color: var(--text);
+}
+input[type="date"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-inline-size: 0;
+  box-sizing: border-box;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  flex: 0 0 auto;
+  margin: 0;
 }
 textarea {
   min-height: 78px;
@@ -832,7 +855,7 @@ textarea {
     grid-template-columns: 1fr;
   }
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .setup-card {
     padding: 20px;
