@@ -303,5 +303,8 @@ export function selectDailyResult(results: readonly FanResult[], stats: DailySta
 export function createShareText(config: FanToolConfig, result: FanResult, name = "") {
   const intro = name ? `${name}さんの「${config.name}」` : `「${config.name}」`;
   const conclusion = config.id === "liver-match" ? `\n診断結果：月乃美玲 ${FAN_MARK}` : "";
-  return `${intro}\n${result.share}${conclusion}\n${HASHTAG}`;
+  const resultText = config.id === "liver-match" && name
+    ? `${name}さんに合うライバー像\n${result.body}`
+    : result.share;
+  return `${intro}\n${resultText}${conclusion}\n${HASHTAG}`;
 }

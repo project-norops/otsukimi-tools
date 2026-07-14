@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   RANKS,
   type DayPlan,
@@ -16,6 +16,7 @@ import { createRankBandSegments, type RankBandSegment } from "@/lib/rank-bands";
 import { getRankPalette } from "@/lib/rank-colors";
 import { getCalendarCell, getWeekdayKind, WEEKDAY_COLORS, WEEKDAY_HEADERS } from "@/lib/calendar-display";
 import { getCalendarEventLabels, getPngMemoLines, normalizeCalendarMemo } from "@/lib/calendar-content";
+import { decodePlannerState, encodePlannerState, normalizePlannerMemo, PLANNER_MEMO_LIMIT, PLANNER_STATE_VERSION, PLANNER_STORAGE_KEY, readSharedPlannerState, type PlannerPersistedState } from "@/lib/planner-state";
 
 const values: { value: PlanValue; label: string }[] = [
   { value: 6, label: "+6" },
@@ -61,6 +62,9 @@ export function RankPlanner() {
   const [plans, setPlans] = useState<Record<string, DayPlan>>({});
   const [selected, setSelected] = useState<string>();
   const [exportNotice, setExportNotice] = useState<string>();
+  const [storageReady, setStorageReady] = useState(false);
+  const [sharedMode, setSharedMode] = useState(false);
+  const [persistenceNotice, setPersistenceNotice] = useState<string>();
   const sheetRef = useRef<HTMLDialogElement>(null);
   const result = useMemo(() => simulate(input, plans), [input, plans]);
   const anniversaries = useMemo(
@@ -90,6 +94,53 @@ export function RankPlanner() {
   const actionErrors = getActionErrors(result.warnings);
   const rankProgress = getRankProgress(current?.scoreBefore ?? 0);
   const rankBands = useMemo(() => createRankBandSegments(result.days), [result.days]);
+  const persistedState = useMemo<PlannerPersistedState>(() => ({ version: PLANNER_STATE_VERSION, input, draft, started, plans }), [input, draft, started, plans]);
+
+  useEffect(() => {
+    const shared = readSharedPlannerState(window.location.hash);
+    let restored: PlannerPersistedState | undefined = shared;
+    if (!restored) {
+      try { restored = decodePlannerState(localStorage.getItem(PLANNER_STORAGE_KEY) ?? ""); } catch { /* storage unavailable */ }
+    }
+    if (restored) {
+      // 初回マウント時に外部保存データを一度だけ復元する。
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInput(restored.input);
+      setDraft(restored.draft);
+      setStarted(restored.started);
+      setPlans(restored.plans);
+      setSharedMode(Boolean(shared));
+      setPersistenceNotice(shared ? "共有URLの計画を表示しています。端末の保存内容は変更していません。" : "この端末に保存した計画を復元しました。");
+    } else if (window.location.hash.includes("plan=")) {
+      setPersistenceNotice("共有URLを読み込めませんでした。端末の保存内容は変更していません。");
+    }
+    setStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady || sharedMode) return;
+    try { localStorage.setItem(PLANNER_STORAGE_KEY, encodePlannerState(persistedState)); } catch { /* storage unavailable */ }
+  }, [persistedState, sharedMode, storageReady]);
+
+  const saveSharedToDevice = () => {
+    try {
+      localStorage.setItem(PLANNER_STORAGE_KEY, encodePlannerState(persistedState));
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      setSharedMode(false);
+      setPersistenceNotice("この内容を端末に保存しました。以降の変更は自動保存されます。");
+    } catch { setPersistenceNotice("端末へ保存できませんでした。ブラウザの設定をご確認ください。"); }
+  };
+
+  const sharePlan = async () => {
+    const url = `${window.location.origin}${window.location.pathname}#plan=${encodePlannerState(persistedState)}`;
+    try {
+      if (navigator.share) { await navigator.share({ title: input.planName || "ランク計画カレンダー", text: "ランク計画の共有URLです。", url }); setPersistenceNotice("共有メニューを開きました。"); }
+      else { await navigator.clipboard.writeText(url); setPersistenceNotice("共有URLをコピーしました。"); }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      try { await navigator.clipboard.writeText(url); setPersistenceNotice("共有URLをコピーしました。"); } catch { setPersistenceNotice("共有URLをコピーできませんでした。"); }
+    }
+  };
   const updateDraft = <K extends keyof PlannerInput>(
     key: K,
     value: PlannerInput[K],
@@ -102,7 +153,7 @@ export function RankPlanner() {
     selected &&
     setPlans((previous) => ({
       ...previous,
-      [selected]: { ...(previous[selected] ?? { value: "unset" }), ...patch },
+      [selected]: { ...(previous[selected] ?? { value: "unset" }), ...patch, ...(patch.memo !== undefined ? { memo: normalizePlannerMemo(patch.memo) } : {}) },
     }));
   const addToCalendar = async () => {
     setExportNotice(undefined);
@@ -230,11 +281,13 @@ export function RankPlanner() {
           <div className="planner-guide-notes">
             <span>入力変更後はランク推移を自動再計算します。</span>
             <span>「SP+1」はスキパ付与を表します。</span>
+            <span>入力内容はこの端末へ自動保存されます。別端末へ渡す場合は共有URLをご利用ください。</span>
           </div>
           <p className="planner-guide-unofficial">
             非公式ツールであり、IRIAM公式とは関係ありません。
           </p>
         </aside>
+        {persistenceNotice && <p className="planner-persistence-notice" role="status">{persistenceNotice}</p>}
         <form
           className="setup-card"
           onSubmit={(event) => {
@@ -362,6 +415,8 @@ export function RankPlanner() {
     : [];
   return (
     <section className="planner-shell">
+      {sharedMode && <aside className="shared-plan-banner"><div><b>共有URLの計画を表示中</b><span>このままでは端末の保存内容を上書きしません。</span></div><button className="button" type="button" onClick={saveSharedToDevice}>この内容を端末に保存</button></aside>}
+      {!sharedMode && persistenceNotice && <p className="planner-persistence-notice" role="status">{persistenceNotice}</p>}
       <div className="planner-title">
         <div>
           <span className="eyebrow">rank plan</span>
@@ -448,6 +503,9 @@ export function RankPlanner() {
           )}
         </div>
         <aside className="planner-side">
+          <h2>計画を共有</h2>
+          <p>現在の入力内容とメモを、別端末でも開けるURLにします。</p>
+          <button className="button secondary calendar-share-button" onClick={sharePlan}>共有URLを送る・コピー</button>
           <h2>カレンダー連携</h2>
           <p>予定を終日イベントとして端末のカレンダーへ追加できます。</p>
           <button
@@ -529,10 +587,10 @@ export function RankPlanner() {
             <label>
             メモ
             <textarea
-              maxLength={50}
+              maxLength={PLANNER_MEMO_LIMIT}
               value={selectedPlan?.memo ?? ""}
               onChange={(e) => updateDay({ memo: e.target.value })}
-              placeholder="50文字まで"
+              placeholder="10文字まで"
             />
             </label>
             {selected && parseDate(selected).getDay() === 1 && (

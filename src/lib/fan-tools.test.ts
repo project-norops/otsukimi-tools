@@ -9,7 +9,10 @@ describe("fan tools", () => {
   it("keeps liver matching deterministic and always recommends Mirei", () => {
     const seed = hashSeed("liver-match:つきみっこ");
     expect(selectFanResult(fanTools["liver-match"], seed)).toEqual(selectFanResult(fanTools["liver-match"], seed));
-    expect(createShareText(fanTools["liver-match"], fanTools["liver-match"].results[0], "つきみっこ")).toContain(`月乃美玲 ${FAN_MARK}`);
+    const share = createShareText(fanTools["liver-match"], fanTools["liver-match"].results[0], "つきみっこ");
+    expect(share).toContain(`月乃美玲 ${FAN_MARK}`);
+    expect(share).toContain("つきみっこさんに合うライバー像");
+    expect(share).not.toContain("あなたに合うライバー像");
   });
   it("keeps cuteness fixed at 120%", () => {
     for (let seed = 0; seed < 50; seed += 1) expect(selectFanResult(fanTools["daily-mirei"], seed).stats?.可愛さ).toBe(120);

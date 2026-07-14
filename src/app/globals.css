@@ -286,6 +286,11 @@ section > h1 {
 .planner-guide + .setup-card {
   margin-top: 16px;
 }
+.planner-persistence-notice { width: 100%; max-width: 760px; margin: 14px auto; padding: 11px 14px; border-radius: 14px; background: #f3fbf5; color: #416b4b; font-size: 12px; line-height: 1.6; text-align: center; }
+.shared-plan-banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding: 16px 18px; border: 1px solid #caeacf; border-radius: 18px; background: #f3fbf5; }
+.shared-plan-banner div { display: grid; gap: 3px; }
+.shared-plan-banner span { color: #54715b; font-size: 12px; }
+.shared-plan-banner .button { flex: 0 0 auto; }
 .setup-card,
 .month-card,
 .warnings,
@@ -1092,6 +1097,7 @@ textarea {
   .hero-actions .button {
     text-align: center;
   }
+  .shared-plan-banner { align-items: stretch; flex-direction: column; }
   .fan-intro { padding-top: 12px; }
   .fan-play-card, .fan-result { padding: 20px 16px; border-radius: 22px; }
   .fan-actions { grid-template-columns: 1fr; }

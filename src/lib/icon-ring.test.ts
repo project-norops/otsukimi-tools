@@ -12,9 +12,9 @@ describe("icon ring image transform", () => {
     expect(portrait.height).toBe(ICON_OUTPUT_SIZE * 2);
   });
   it("clamps zoom to the supported range", () => {
-    expect(clampZoom(0.2)).toBe(1);
-    expect(clampZoom(2.25)).toBe(2.25);
-    expect(clampZoom(8)).toBe(4);
+    expect(clampZoom(0.2)).toBe(0.5);
+    expect(clampZoom(1.25)).toBe(1.25);
+    expect(clampZoom(8)).toBe(1.5);
   });
   it("converts pointer movement from preview pixels to output pixels", () => {
     expect(canvasDelta(30, 342)).toBe(45);

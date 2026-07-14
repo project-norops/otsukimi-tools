@@ -1,6 +1,6 @@
 export const ICON_OUTPUT_SIZE = 513;
-export const MIN_ICON_ZOOM = 1;
-export const MAX_ICON_ZOOM = 4;
+export const MIN_ICON_ZOOM = 0.5;
+export const MAX_ICON_ZOOM = 1.5;
 
 export type IconTransform = {
   baseScale: number;

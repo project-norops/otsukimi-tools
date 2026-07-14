@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { canvasDelta, clampZoom, createCoverTransform, getIconDrawRect, ICON_OUTPUT_SIZE, type IconTransform } from "@/lib/icon-ring";
+import { canvasDelta, clampZoom, createCoverTransform, getIconDrawRect, ICON_OUTPUT_SIZE, MAX_ICON_ZOOM, MIN_ICON_ZOOM, type IconTransform } from "@/lib/icon-ring";
 
 type LoadedImage = { element: HTMLImageElement; name: string };
 type PointerPosition = { x: number; y: number };
@@ -29,6 +29,7 @@ export function IconRingTool() {
   const [icon, setIcon] = useState<LoadedImage | null>(null);
   const [ring, setRing] = useState<LoadedImage | null>(null);
   const [transform, setTransform] = useState<IconTransform | null>(null);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("アイコン画像と、規定サイズの透過PNGリングを選択してください。");
 
   const draw = useCallback(() => {
@@ -104,14 +105,28 @@ export function IconRingTool() {
     previousGesture.current = null;
   }
 
-  function saveImage() {
+  async function saveImage() {
     if (!icon || !ring) { setMessage("アイコン画像とリング画像を両方選択してください。"); return; }
+    if (saving) return;
+    setSaving(true);
+    setMessage("513×513pxのPNGを作成しています。少しお待ちください…");
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     draw();
-    const link = document.createElement("a");
-    link.download = "icon-with-ring.png";
-    link.href = canvasRef.current!.toDataURL("image/png");
-    link.click();
-    setMessage("513×513pxのPNGを保存しました。");
+    canvasRef.current!.toBlob((blob) => {
+      if (!blob) {
+        setMessage("PNGを作成できませんでした。もう一度お試しください。");
+        setSaving(false);
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "icon-with-ring.png";
+      link.href = url;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage("513×513pxのPNGを保存しました。");
+      setSaving(false);
+    }, "image/png");
   }
 
   return <section className="icon-ring-shell">
@@ -126,10 +141,10 @@ export function IconRingTool() {
           <label className="image-file-button"><span>1</span><b>アイコン画像</b><small>{icon?.name ?? "画像を選択"}</small><input type="file" accept="image/*" onChange={(event) => chooseIcon(event.target.files?.[0])} /></label>
           <label className="image-file-button"><span>2</span><b>リング画像</b><small>{ring?.name ?? "透過PNGを選択"}</small><input type="file" accept="image/png" onChange={(event) => chooseRing(event.target.files?.[0])} /></label>
         </div>
-        <label className="icon-zoom">大きさ <input type="range" min="1" max="4" step="0.01" value={transform?.zoom ?? 1} disabled={!icon} onChange={(event) => setTransform((value) => value ? { ...value, zoom: Number(event.target.value) } : value)} /><output>{Math.round((transform?.zoom ?? 1) * 100)}%</output></label>
+        <label className="icon-zoom">大きさ <input type="range" min={MIN_ICON_ZOOM} max={MAX_ICON_ZOOM} step="0.01" value={transform?.zoom ?? 1} disabled={!icon} onChange={(event) => setTransform((value) => value ? { ...value, zoom: clampZoom(Number(event.target.value)) } : value)} /><output>{Math.round((transform?.zoom ?? 1) * 100)}%</output></label>
         <button className="text-button icon-reset" type="button" onClick={resetPosition} disabled={!icon}>位置と大きさをリセット</button>
         <p className="icon-ring-message" role="status">{message}</p>
-        <button className="button icon-save" type="button" onClick={saveImage} disabled={!icon || !ring}>画像を保存</button>
+        <button className="button icon-save" type="button" onClick={saveImage} disabled={!icon || !ring || saving} aria-busy={saving}>{saving ? "PNGを作成中…" : "画像を保存"}</button>
       </div>
     </div>
     <p className="disclaimer">出力は513×513pxのPNGです。リングは規定サイズで作成された透過PNGをご使用ください。画像はサーバーへ送信されません。</p>

@@ -123,10 +123,10 @@ export function FanTool({ config }: { config: FanToolConfig }) {
 
     {result && <article className="fan-result" aria-live="polite">
       <span className="fan-result-label">今回の結果</span>
-      <h2>{result.title}</h2>
+      <h2>{config.id === "liver-match" && name.trim() ? `${name.trim().slice(0, 40)}さんに合うライバー像` : result.title}</h2>
       <p className="fan-result-body">{result.body}</p>
       {result.stats && <dl className="fan-stats">{Object.entries(result.stats).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}%</dd><span><i style={{ width: `${Math.min(value, 100)}%` }} /></span></div>)}</dl>}
-      {config.id === "liver-match" && <div className="fan-match"><small>宇宙規模の検索結果</small><strong>月乃美玲 {FAN_MARK}</strong></div>}
+      {config.id === "liver-match" && <div className="fan-match"><small>診断結果</small><strong>月乃美玲 {FAN_MARK}</strong></div>}
       <div className="fan-actions">
         <a className="button" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer">Xに投稿する</a>
         <button className="button secondary" type="button" onClick={copyResult}>結果をコピー</button>
