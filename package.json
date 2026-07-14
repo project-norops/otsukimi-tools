@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "review:fan-results": "node --experimental-strip-types scripts/export-fan-results.mjs",
     "check": "npm run test && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {

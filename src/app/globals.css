@@ -895,6 +895,43 @@ textarea {
 .empty {
   background: #fcfafb;
 }
+.fan-shell {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.fan-intro { text-align: center; padding: 28px 0 20px; }
+.fan-icon { display: grid; place-items: center; width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 24px; background: linear-gradient(135deg, var(--soft-pink), var(--light-green)); font-size: 38px; box-shadow: 0 10px 30px rgba(170,82,108,.12); }
+.fan-intro h1 { margin: 10px 0 14px; font-size: clamp(32px, 8vw, 52px); line-height: 1.2; }
+.fan-intro p { max-width: 590px; margin: auto; color: var(--sub); font-size: 16px; line-height: 1.8; }
+.fan-play-card, .fan-result { margin-top: 18px; padding: 26px; background: #fff; border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 12px 38px rgba(170,82,108,.08); }
+.fan-main-button { width: 100%; min-height: 56px; font-size: 17px; }
+.fan-name { margin-bottom: 20px; }
+.fan-loading { display: grid; justify-items: center; gap: 8px; padding: 28px 0 2px; color: #c73c62; font-weight: 800; text-align: center; }
+.fan-loading span { display: block; font-size: 38px; animation: fan-float .8s ease-in-out infinite alternate; }
+.fan-loading p { margin: 0; }
+@keyframes fan-float { to { transform: translateY(-8px) rotate(5deg); } }
+.fan-notice { margin: 14px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--pale-pink); color: #9d3655; font-size: 13px; text-align: center; }
+.fan-result { position: relative; overflow: hidden; text-align: center; }
+.fan-result::before { content: ""; position: absolute; inset: 0 0 auto; height: 7px; background: linear-gradient(90deg, var(--pink), #e7bd4b, var(--green)); }
+.fan-result-label { display: inline-block; padding: 5px 11px; border-radius: 999px; background: var(--soft-pink); color: #b62e54; font-size: 12px; font-weight: 900; }
+.fan-result h2 { margin: 18px 0 12px; font-size: clamp(26px, 7vw, 38px); }
+.fan-result-body { margin: 0 auto; max-width: 600px; font-size: 17px; line-height: 1.9; }
+.fan-stats { display: grid; gap: 11px; margin: 25px auto 0; text-align: left; }
+.fan-stats div { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; }
+.fan-stats dt { font-size: 13px; font-weight: 800; }
+.fan-stats dd { margin: 0; color: #c73c62; font-size: 13px; font-weight: 900; }
+.fan-stats span { grid-column: 1 / -1; height: 9px; overflow: hidden; border-radius: 999px; background: #f4edf0; }
+.fan-stats i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pink), #f3b64e); }
+.fan-stats div:last-child i { background: linear-gradient(90deg, var(--pink), #e7bd4b); }
+.fan-match { display: grid; gap: 7px; margin: 26px 0 0; padding: 22px; border-radius: 22px; background: linear-gradient(135deg, #fff2f6, #f2fff4); }
+.fan-match small { color: var(--sub); font-weight: 800; }
+.fan-match strong { color: #c62f5a; font-size: clamp(24px, 6vw, 34px); }
+.fan-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 26px; }
+.fan-actions .button:first-child { grid-column: 1 / -1; min-height: 54px; }
+.fan-actions .button { border: 0; }
+.fan-retry { margin-top: 18px; border: 0; background: transparent; color: #c73c62; font-size: 13px; font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+.fan-footnote { margin: 24px 0; color: var(--sub); font-size: 11px; line-height: 1.7; text-align: center; }
 @media (max-width: 800px) {
   input,
   textarea {
@@ -1044,4 +1081,8 @@ textarea {
   .hero-actions .button {
     text-align: center;
   }
+  .fan-intro { padding-top: 12px; }
+  .fan-play-card, .fan-result { padding: 20px 16px; border-radius: 22px; }
+  .fan-actions { grid-template-columns: 1fr; }
+  .fan-actions .button:first-child { grid-column: auto; }
 }
