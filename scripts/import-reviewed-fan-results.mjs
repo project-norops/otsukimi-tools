@@ -10,7 +10,7 @@ const unescapeCell = (value) => value.trim().replaceAll("\\|", "|").replaceAll("
 const rows = reviewed.split(/\r?\n/).flatMap((line) => {
   if (!/^\| (daily|fortune|alert|match)-\d+ \|/.test(line)) return [];
   const cells = line.slice(2, -2).split(" | ").map(unescapeCell);
-  return [{ id: cells[0], title: cells[2], body: cells[3] }];
+  return [{ id: cells[0], title: cells[2], body: cells[3], share: cells[4] }];
 });
 
 if (rows.length !== 88) throw new Error(`Expected 88 reviewed rows, found ${rows.length}.`);
@@ -46,6 +46,11 @@ const updatedMatchBlock = matchBlock[0].replace(/^  "(?:[^"\\]|\\.)*",$/gm, (lin
 });
 if (matchIndex + 1 !== matchRows.length) throw new Error("Reviewed match result count did not match source.");
 source = source.replace(matchBlock[0], updatedMatchBlock);
+
+const shareEntries = rows.map((row) => `  "${escapeTs(row.id)}": "${escapeTs(row.share)}",`).join("\n");
+const sharePattern = /const reviewedShareById: Record<string, string> = \{[\s\S]*?\n\};/;
+if (!sharePattern.test(source)) throw new Error("Could not find reviewedShareById.");
+source = source.replace(sharePattern, `const reviewedShareById: Record<string, string> = {\n${shareEntries}\n};`);
 
 writeFileSync(sourcePath, source, "utf8");
 console.log(`Imported ${rows.length} reviewed results.`);

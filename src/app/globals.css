@@ -70,6 +70,7 @@ label {
   font-weight: 900;
   color: #d83e68;
 }
+.header-home { color: #c73c62; font-size: 14px; font-weight: 800; }
 .site-header nav {
   display: flex;
   gap: 18px;
@@ -970,10 +971,6 @@ textarea {
     width: 100%;
     font-size: 9px;
   }
-  .site-header nav {
-    gap: 10px;
-    font-size: 12px;
-  }
 }
 @media (max-width: 560px) {
   .site-header {
@@ -981,17 +978,6 @@ textarea {
   }
   .brand {
     font-size: 14px;
-  }
-  .site-header nav a {
-    font-size: 0;
-  }
-  .site-header nav a:first-child::after {
-    content: "ライバー";
-    font-size: 12px;
-  }
-  .site-header nav a:last-child::after {
-    content: "リスナー";
-    font-size: 12px;
   }
   main {
     padding: 28px 12px 60px;

@@ -24,6 +24,98 @@ export type FanToolConfig = {
   results: readonly FanResult[];
 };
 
+// FAN_RESULTS_REVIEWED.md から同期する。手作業で編集しないこと。
+const reviewedShareById: Record<string, string> = {
+  "daily-01": "省エネ美玲ちゃん\n本日は省エネ運転。癒しボイスでリスナーのみんなが寝ないように気を付けよう。",
+  "daily-02": "やる気は温存中\nやる気はないんじゃない。ここぞという時まで温存してるだけ。",
+  "daily-03": "清楚は本日お休み\n清楚はお休みだけど、可愛さ全開120%！",
+  "daily-04": "強がりフル装備\n平気そうな顔が上手すぎる日。たまにはみんなに頼ってもいいかな？",
+  "daily-05": "甘え度、上昇中\nいつもより少し甘め。つきみっこにはうれしい誤算。",
+  "daily-06": "言葉の切れ味よし\n毒舌は冴えている。刺さっているのに、なぜか笑ってしまう。",
+  "daily-07": "ごきげん美玲ちゃん\n笑い声がよく似合う日。周りまでちょっと楽しくなる。",
+  "daily-08": "ねむねむモード\nまぶたは重め、可愛さは軽やか。無理せずいこう。",
+  "daily-09": "バランス型美玲ちゃん\nだいたいちょうどいい。でも、可愛さは今日も世界一！",
+  "daily-10": "絶好調の予感\n今日は何をしても絵になる日。可愛いだけとは言わせない。",
+  "daily-11": "静かな強さの日\n派手ではないけど、ちゃんと前へ進める日。",
+  "daily-12": "ツン多め観測\n 素直じゃないところも～、愛してくれるよ～ねっ？",
+  "daily-13": "デレの気配あり\nふとした瞬間の優しさに注意。可愛さが急に加速します。",
+  "daily-14": "ポンの予感\n小さなうっかりもそれが今日の見どころ！",
+  "daily-15": "笑い上戸モード\n楽しくなったら止まらない。みんなも笑顔にな～れ！",
+  "daily-16": "マイペース最強説\n急がなくても大丈夫。美玲の速度が今日の正解。",
+  "daily-17": "クールに見えて可愛い\n涼しい顔をしていても、可愛さは隠せません。",
+  "daily-18": "おしゃべり日和\n話があっちへこっちへ。それも含めて楽しい時間になりそう。",
+  "daily-19": "気まぐれ日和\n予定どおりじゃなくても、面白い方へ着地する予感。",
+  "daily-20": "本日も美玲ちゃん\n高い日も低い日も、最終評価は可愛いのでヨシ。",
+  "daily-21": "こんつきみー日和\nひと声聞けば空気が変わる日。今日も可愛さは満点超え。",
+  "daily-22": "おかえりー待機中\n帰ってきたくなる声がある。それだけで今日は少しいい日。",
+  "fortune-01": "のんびりバフ\n急がない方がうまくいく日。美玲ちゃんの声でさらに回復できそう。",
+  "fortune-02": "笑顔ボーナス\n小さないいことを見つけやすい日。笑顔を見られたら効果倍増。",
+  "fortune-03": "配信イベント発生\n特に何もない普通の日。でも配信があれば大勝利！",
+  "fortune-04": "ちょい疲れ運\n今日は少し疲れ気味。美玲ちゃんの声を聞いて癒されよう。",
+  "fortune-05": "巻き返し運\n午前が微妙でもまだ大丈夫。可愛いを補給して後半戦へ。",
+  "fortune-06": "ごほうび待ち\nやることをひとつ片づけたら、美玲ちゃんタイムが待ってるよ！",
+  "fortune-07": "平和がいちばん\n大事件はなさそう。それが何より。美玲ちゃんは今日も可愛い。",
+  "fortune-08": "ツイてる予感\n今日はかなりいい感じ。声まで聞けたら完璧です。",
+  "fortune-09": "寄り道吉\n予定外の寄り道に小さな発見あり。でも、おつきみ茶屋には直行すること！",
+  "fortune-10": "無理しない吉\n頑張りすぎない選択が正解。歌みた聞いてひと休み。",
+  "fortune-11": "おしゃべり吉\n誰かと笑うと運気上昇。美玲ちゃんの爆笑なら特大ボーナス。",
+  "fortune-12": "静かに好調\n目立たないけれど順調な日。推しが可愛ければ、それで十分。",
+  "fortune-13": "金運は慎重\nかわいいものに財布が反応しそう。一度深呼吸してから判断を。",
+  "fortune-14": "対人運ふんわり\nやさしい一言が返ってきそう。配信コメントも気楽にどうぞ。",
+  "fortune-15": "テンション充電中\n元気はあとからついてくる日。大好きな声を聴いて落ち着いて。",
+  "fortune-16": "ひらめき運\nふと浮かんだことが案外正解。楽しそうな方を選んでみよう。",
+  "fortune-17": "早めの休憩吉\n疲れる前に休むと勝ち。美玲ちゃん成分の補給も忘れずに。",
+  "fortune-18": "普通にいい日\n今日はまあ普通。美玲ちゃん可愛い。うん、最高。",
+  "fortune-19": "可愛い遭遇運\nタイムラインでたれみみうさぎの可愛い娘に出会えそうな予感。",
+  "fortune-20": "夜から上向き\n昼がいまひとつでも、夜に楽しみが待っていそう。",
+  "fortune-21": "こんつきみー吉\nその挨拶を聞けたら運気回復。おつきみ茶屋に待ち人あり。",
+  "fortune-22": "満月級の大吉\n今日はツイてる。美玲ちゃんの笑顔で絶好調！",
+  "alert-01": "ほろ酔い注意報\nいつもよりふわっとした美玲ちゃんが観測される可能性があります。不意の可愛さで理性を失わないようご注意ください。",
+  "alert-02": "酔っぱらい注意報\nごきげんな声量と笑いが増える見込みです。つられて笑い続けるおそれがあります。",
+  "alert-03": "甘えんぼ注意報\n美玲ちゃんの甘え成分が高まる見込みです。心拍数上昇にご注意ください。",
+  "alert-04": "強がり注意報\n強がりな美玲ちゃんが観測される見込みです。隠しきれない可愛さを見逃さないようご注意ください。",
+  "alert-05": "毒舌注意報\n言葉の切れ味が増す可能性があります。なぜか喜ぶつきみっこの続出にご注意ください。",
+  "alert-06": "ツンツン注意報\n素直じゃない反応が増える見込みです。行間の可愛さに十分ご注意ください。",
+  "alert-07": "デレ注意報\n予告なくやさしさがこぼれる可能性があります。急な致命傷にご注意ください。",
+  "alert-08": "照れ隠し注意報\n話題をそらす、笑ってごまかす等の現象が予想されます。深追いせず可愛さを観測してください。",
+  "alert-09": "ねむねむ注意報\n語尾とまぶたがゆるむ可能性があります。眠気より先に心を奪われないようご注意ください。",
+  "alert-10": "ごきげん注意報\n鼻歌級の上機嫌が広がる見込みです。笑顔の伝染にご注意ください。",
+  "alert-11": "爆笑注意報\n美玲ちゃんの笑いが止まらなくなる可能性があります。イヤホン使用時の音量にご注意ください。",
+  "alert-12": "お疲れ注意報\nややお疲れの可能性があります。それでも声を聞けた場合、必要以上にうれしくなるおそれがあります。",
+  "alert-13": "ポン注意報\n小さな勘違いやうっかりが発生する見込みです。即座に愛でたくなる衝動にご注意ください。",
+  "alert-14": "深夜テンション注意報\n通常より話題が自由に飛び回る可能性があります。睡眠時間の消失にご注意ください。",
+  "alert-15": "低テンション注意報\n落ち着いた声が観測される見込みです。静かな可愛さにじわじわ刺されないようご注意ください。",
+  "alert-16": "ハイテンション注意報\n声と話題が加速する見込みです。置いていかれても笑顔だけは確保してください。",
+  "alert-17": "早口注意報\n好きな話題で速度が上がる可能性があります。聞き逃しと笑いすぎにご注意ください。",
+  "alert-18": "もぐもぐ注意報\nおいしそうな反応が観測される見込みです。深夜の空腹を刺激されないようご注意ください。",
+  "alert-19": "まったり注意報\nゆるやかな空気が広がる見込みです。時間を忘れて居つづけるおそれがあります。",
+  "alert-20": "おしゃべり注意報\n話題が尽きない可能性があります。気づけば予定時刻を過ぎているおそれがあります。",
+  "alert-21": "笑顔注意報\n不意にいい笑顔が観測される見込みです。スクリーンの前でにやけないようご注意ください。",
+  "alert-22": "可愛さ警報\n本日は可愛さが広範囲で120%に達する見込みです。回避は困難ですので、素直にお楽しみください。",
+  "match-01": "あなたに合うライバー像\n疲れた日にふっと笑えて、気づけば元気になれるようなライバーと相性が良いようです。",
+  "match-02": "あなたに合うライバー像\nよく笑い、時には毒舌で、たまに思いがけない一面を見せてくれるライバーがおすすめです。",
+  "match-03": "あなたに合うライバー像\n落ち着ける声と予測できない楽しさを、どちらも持っているライバーが合いそうです。",
+  "match-04": "あなたに合うライバー像\n飾らない言葉で笑わせてくれて、ふとした瞬間に可愛いライバーとの相性が抜群です。",
+  "match-05": "あなたに合うライバー像\n毎日の終わりに『今日も見てよかった』と思えるライバーを求めているようです。",
+  "match-06": "あなたに合うライバー像\n楽しい雑談と心地よい声を行き来できる、表情豊かなライバーがぴったりです。",
+  "match-07": "あなたに合うライバー像\n完璧すぎず、うっかりまで魅力に変えてしまうライバーに惹かれる傾向があります。",
+  "match-08": "あなたに合うライバー像\n笑い声を聞くだけで空気が明るくなるようなライバーがおすすめです。",
+  "match-09": "あなたに合うライバー像\nツンとデレの絶妙な配分を楽しめるライバーとの相性が高いようです。",
+  "match-10": "あなたに合うライバー像\n何気ない一言があとからじわじわ効いてくるライバーが合いそうです。",
+  "match-11": "あなたに合うライバー像\n元気な日にも静かな日にも、自然体で見守りたくなるライバーがおすすめです。",
+  "match-12": "あなたに合うライバー像\n声、笑顔、たれみみの三要素に加えて、可愛さ120%が必要という分析結果です。",
+  "match-13": "あなたに合うライバー像\n気楽に笑えて、いつの間にか毎日の楽しみになっているライバーが理想です。",
+  "match-14": "あなたに合うライバー像\n予想外の話題と親しみやすい空気を持つライバーに高い適性があります。",
+  "match-15": "あなたに合うライバー像\nやさしさだけでなく、切れ味のよい一言も楽しめるライバーがぴったりです。",
+  "match-16": "あなたに合うライバー像\n配信を開いた瞬間に『おかえり』と聞こえてくる安心感を求めています。",
+  "match-17": "あなたに合うライバー像\n まったりした時間とくすっと笑える瞬間の両方を届けるライバーがおすすめです。",
+  "match-18": "あなたに合うライバー像\n頑張りすぎずに応援できて、癒しボイスのライバーが合いそうです。",
+  "match-19": "あなたに合うライバー像\n可愛いだけでは足りません。面白さと意外性まで備えたライバーが必要です。",
+  "match-20": "あなたに合うライバー像\n統計学上、月と団子とうさぎに縁のあるライバーとの相性が極めて高いです。",
+  "match-21": "あなたに合うライバー像\n『こんつきみ』の響きに反応できるライバー適性が検出されました。",
+  "match-22": "あなたに合うライバー像\n膨大な候補を比較した結果、まったり癒し系たれみみうさぎが最適と判定されました。",
+};
+
 export function hashSeed(value: string): number {
   let hash = 2166136261;
   for (let i = 0; i < value.length; i += 1) {
@@ -43,7 +135,7 @@ function mulberry32(seed: number) {
 }
 
 const makeResult = (id: string, title: string, body: string, key: string, special = ""): FanResult => ({
-  id, title, body, key, special, weight: 1, share: `${title}\n${body}`,
+  id, title, body, key, special, weight: 1, share: reviewedShareById[id] ?? `${title}\n${body}`,
 });
 
 const dailyTexts = [
@@ -158,11 +250,54 @@ export const fanTools: Record<FanToolId, FanToolConfig> = {
 
 export function selectFanResult(config: FanToolConfig, seed: number): FanResult {
   const random = mulberry32(seed);
-  const base = config.results[Math.floor(random() * config.results.length)];
-  if (config.id !== "daily-mirei") return base;
+  if (config.id !== "daily-mirei") return config.results[Math.floor(random() * config.results.length)];
   const labels = ["やる気度", "清楚度", "強がり度", "甘え度", "毒舌度"];
   const stats = Object.fromEntries(labels.map((label) => [label, Math.floor(random() * 101)]));
+  const base = selectDailyResult(config.results, stats, random());
   return { ...base, stats: { ...stats, 可愛さ: 120 } };
+}
+
+type DailyStats = Record<string, number>;
+
+/** 表示パラメーターを根拠に「本日の美玲ちゃん」の結果を選ぶ。 */
+export function selectDailyResult(results: readonly FanResult[], stats: DailyStats, roll = 0): FanResult {
+  const byId = (id: string) => {
+    const result = results.find((item) => item.id === id);
+    if (!result) throw new Error(`Daily result not found: ${id}`);
+    return result;
+  };
+  const motivation = stats.やる気度;
+  const elegance = stats.清楚度;
+  const brave = stats.強がり度;
+  const sweet = stats.甘え度;
+  const sharp = stats.毒舌度;
+  const values = [motivation, elegance, brave, sweet, sharp];
+  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const spread = Math.max(...values) - Math.min(...values);
+
+  // 複数項目の特徴は、単独の極端値より先に評価する。
+  if (average >= 78) return byId("daily-10");
+  if (average <= 22) return byId("daily-01");
+  if (elegance <= 28 && brave >= 68) return byId("daily-12");
+  if (sweet >= 72 && brave <= 35) return byId("daily-13");
+  if (motivation <= 28 && sweet >= 65) return byId("daily-08");
+  if (elegance >= 72 && sharp <= 32) return byId("daily-17");
+  if (spread <= 16) return byId("daily-09");
+
+  // 単独で際立つ値に対応する結果。
+  if (motivation <= 22) return byId("daily-02");
+  if (elegance <= 22) return byId("daily-03");
+  if (brave >= 80) return byId("daily-04");
+  if (sweet >= 80) return byId("daily-05");
+  if (sharp >= 80) return byId("daily-06");
+  if (motivation >= 78) return byId("daily-18");
+  if (spread >= 72) return byId("daily-19");
+  if (average >= 66) return byId("daily-07");
+  if (average <= 36) return byId("daily-16");
+
+  // 数値に強い偏りがない日は、矛盾しない日常系の文言から選ぶ。
+  const neutralIds = ["daily-11", "daily-14", "daily-15", "daily-20", "daily-21", "daily-22"];
+  return byId(neutralIds[Math.min(neutralIds.length - 1, Math.floor(roll * neutralIds.length))]);
 }
 
 export function createShareText(config: FanToolConfig, result: FanResult, name = "") {

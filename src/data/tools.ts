@@ -14,3 +14,6 @@ export const tools: ToolMetadata[] = [
   { id: "event-split", name: "イベント告知4分割画像", description: "既存素材を4分割投稿向けに整えます。", audiences: ["liver"], status: "in_development" },
   { id: "event-goal", name: "イベント目標逆算", description: "目標と残り期間から必要ポイントを逆算します。", audiences: ["liver", "listener"], status: "in_development" }
 ];
+
+/** ポータルには、現在利用できるツールだけを掲載する。 */
+export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href);
