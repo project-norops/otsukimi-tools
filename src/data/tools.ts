@@ -1,8 +1,8 @@
 export type Audience = "liver" | "listener";
-export interface ToolMetadata { id: string; name: string; description: string; audiences: Audience[]; status: "available" | "in_development"; href?: string }
+export interface ToolMetadata { id: string; name: string; description: string; audiences: Audience[]; status: "available" | "in_development"; href?: string; listed?: boolean }
 export const tools: ToolMetadata[] = [
   { id: "rank-calendar", name: "ランク計画カレンダー", description: "日別スコアとスキパから、3か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
-  { id: "liver-planner", name: "ライバー手帳（仮）", description: "配信予定、制作、締切やプライベートの予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner" },
+  { id: "liver-planner", name: "ライバー手帳（仮）", description: "配信予定、制作、締切やプライベートの予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner", listed: false },
   { id: "daily-mirei", name: "本日の美玲ちゃん", description: "今日の美玲ちゃんを楽しく観測。可愛さはいつでも120%。", audiences: ["liver", "listener"], status: "available", href: "/tools/daily-mirei" },
   { id: "tsukimikko-fortune", name: "つきみっこ専用くじ", description: "今日のコンディションに、美玲ちゃんバフをひとつ。", audiences: ["listener"], status: "available", href: "/tools/tsukimikko-fortune" },
   { id: "mirei-alert", name: "美玲ちゃん注意報", description: "何をしていても結局刺さる。今日の注意報を観測します。", audiences: ["liver", "listener"], status: "available", href: "/tools/mirei-alert" },
@@ -17,4 +17,4 @@ export const tools: ToolMetadata[] = [
 ];
 
 /** ポータルには、現在利用できるツールだけを掲載する。 */
-export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href);
+export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href && tool.listed !== false);
