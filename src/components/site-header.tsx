@@ -13,7 +13,11 @@ export function SiteHeader() {
           priority
           unoptimized
         />
-        <span>すしうさどっとねっと</span>
+        <span className="brand-wordmark" aria-hidden="true">
+          <span>すしうさ</span>
+          <span className="brand-wordmark-pink">どっと</span>
+          <span className="brand-wordmark-orange">ねっと</span>
+        </span>
       </Link>
       <Link className="header-home" href="/#tools">ツール一覧</Link>
     </header>

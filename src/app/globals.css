@@ -83,10 +83,24 @@ label {
   color: var(--nori);
 }
 .brand img {
-  width: 52px;
-  height: 52px;
+  width: 62px;
+  height: 56px;
   object-fit: contain;
 }
+.brand-wordmark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text);
+  font-family: ui-rounded, "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  font-size: clamp(19px, 3vw, 30px);
+  font-weight: 900;
+  letter-spacing: -.075em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.brand-wordmark span { display: inline-block; }
+.brand-wordmark-pink { color: var(--ebi); transform: rotate(-3deg); }
+.brand-wordmark-orange { color: var(--salmon); transform: rotate(2deg); }
 .header-home { color: var(--nori); font-size: 14px; font-weight: 800; }
 .site-header nav {
   display: flex;
@@ -1417,7 +1431,8 @@ textarea {
   .brand {
     font-size: 14px;
   }
-  .brand img { width: 44px; height: 44px; }
+  .brand img { width: 50px; height: 46px; }
+  .brand-wordmark { font-size: 20px; }
   .header-home { font-size: 12px; }
   main {
     padding: 28px 12px 60px;

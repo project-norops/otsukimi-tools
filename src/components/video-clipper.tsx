@@ -380,7 +380,7 @@ export function VideoClipper() {
   }
 
   return <section className="clipper-shell">
-    <header className="tool-intro clipper-intro"><span className="eyebrow">3-step video maker · MVP</span><h1>10秒動画メイカー</h1><p>「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール</p></header>
+    <header className="tool-intro clipper-intro"><span className="eyebrow">3-step video maker · MVP</span><h1>10秒動画メイカー</h1><p>「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール</p><aside className="access-notice"><b>現在はすべて無料</b><span>現在、すべての機能を無料でご利用いただけます。今後の機能追加やアップデートに伴い、一部の高度な機能を有料オプション（プレミアムプラン等）として提供する場合があります。あらかじめご了承ください。</span></aside></header>
     <div className="clipper-notice"><b>読み込み上限</b><span>3分・100MBまで</span><b>おすすめ尺</b><span>10秒（最大15秒）</span></div>
     <label className={`clipper-file ${loadingVideo ? "is-loading" : ""}`}><b>{source ? source.name : "動画を選択"}</b><small>{loadingVideo ? "動画を読み込み中…" : "MP4など、端末で再生できる動画"}</small><input type="file" accept="video/*" onChange={(event) => chooseVideo(event.target.files?.[0])} /></label>
     {source && <div className="clipper-editor">

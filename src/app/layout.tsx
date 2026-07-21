@@ -39,6 +39,7 @@ export default function RootLayout({
           <strong>すしうさどっとねっと</strong>
           <p>配信活動を、少し便利に、少し楽しく。</p>
           <p>キャラクター制作　月乃美玲</p>
+          <p>匿名のアクセス統計にVercel Web Analyticsを使用しています</p>
           <p>© すしうさどっとねっと</p>
         </footer>
       </body>
