@@ -1,3 +1,8 @@
+import { generateAnniversaries } from "@/lib/anniversaries";
+import { simulate } from "@/lib/simulator";
+import { countInclusiveDays, getSimulationRange } from "@/lib/simulation-range";
+import type { PlannerPersistedState } from "@/lib/planner-state";
+
 export const LIVER_PLANNER_STORAGE_KEY = "sushiusa-tools:liver-planner:v1";
 export const LIVER_PLANNER_VERSION = 1;
 
@@ -50,3 +55,28 @@ export function addDays(date: string, count: number) { const value = new Date(`$
 export function formatDate(value: Date) { return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`; }
 export function datesBetween(start: string, count: number) { return Array.from({ length: count }, (_, index) => addDays(start, index)); }
 export function labelDate(date: string) { return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", weekday: "short" }).format(new Date(`${date}T12:00:00`)); }
+
+export type RankCalendarItem = { date: string; title: string; memo?: string };
+
+const rankPlanLabel = (value: unknown) => typeof value === "number" ? `IRIAM (+${value})` : value === "skip" ? "IRIAM (SKIP)" : value === "rest" ? "IRIAM（休み）" : "IRIAM (+1)";
+
+/**
+ * ランク管理カレンダーと同じシミュレーションを読み取り専用で展開する。
+ * 未入力日はランク管理カレンダー本体と同じく +1 として扱う。
+ */
+export function rankCalendarItems(state?: PlannerPersistedState): RankCalendarItem[] {
+  if (!state) return [];
+  const range = getSimulationRange(state.input.baseDate, state.input.simulationMonths);
+  const result = simulate(state.input, state.plans, countInclusiveDays(range.start, range.end), 1);
+  const anniversaries = state.input.debutDate ? generateAnniversaries(state.input.debutDate, range.start, range.end) : [];
+  const anniversaryMap = Object.groupBy(anniversaries, (item) => item.date);
+
+  return result.days.flatMap((day) => {
+    const items: RankCalendarItem[] = [{ date: day.date, title: rankPlanLabel(day.plan.value), memo: day.plan.memo }];
+    const grants = day.weeklyGrant + day.manualGrant;
+    if (grants) items.push({ date: day.date, title: `IRIAM（SP+${grants}）` });
+    if (day.rankEvent) items.push({ date: day.date, title: `IRIAM（${day.rankEvent.label}）` });
+    for (const anniversary of anniversaryMap[day.date] ?? []) items.push({ date: day.date, title: `IRIAM（記念日：${anniversary.label}）` });
+    return items;
+  });
+}

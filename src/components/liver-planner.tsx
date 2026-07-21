@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { decodePlannerState, PLANNER_STORAGE_KEY } from "@/lib/planner-state";
-import { EVENT_CATEGORIES, LIVER_PLANNER_STORAGE_KEY, TASK_CATEGORIES, type EventCategory, type LiverEvent, type LiverPlannerState, type LiverTask, type TaskCategory, addDays, datesBetween, formatDate, labelDate, makeLiverId, readLiverPlannerState } from "@/lib/liver-planner";
+import { EVENT_CATEGORIES, LIVER_PLANNER_STORAGE_KEY, TASK_CATEGORIES, type EventCategory, type LiverEvent, type LiverPlannerState, type LiverTask, type RankCalendarItem, type TaskCategory, addDays, datesBetween, formatDate, labelDate, makeLiverId, rankCalendarItems, readLiverPlannerState } from "@/lib/liver-planner";
 
 type Tab = "home" | "week" | "ten" | "month";
-type RankItem = { date: string; title: string; memo?: string };
+type RankItem = RankCalendarItem;
 const today = () => formatDate(new Date());
 const download = (content: string, name: string) => { const url = URL.createObjectURL(new Blob([content], { type: "application/json" })); const link = document.createElement("a"); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); };
 const timeSort = <T extends { startTime?: string; time?: string; allDay?: boolean }>(a: T, b: T) => Number(Boolean(a.allDay)) - Number(Boolean(b.allDay)) || (a.startTime ?? a.time ?? "99:99").localeCompare(b.startTime ?? b.time ?? "99:99");
 const itemTime = (item: LiverEvent | LiverTask | RankItem) => "startTime" in item ? item.startTime ?? (item.allDay ? "98:00" : "99:00") : "time" in item ? item.time ?? "99:00" : "98:30";
-const rankLabel = (value: unknown) => typeof value === "number" ? `IRIAM (+${value})` : value === "skip" ? "IRIAM (SKIP)" : value === "rest" ? "IRIAM（休み）" : "IRIAM";
 const timeOptions = Array.from({ length: 48 }, (_, index) => `${String(Math.floor(index / 2)).padStart(2, "0")}:${index % 2 ? "30" : "00"}`);
 const categoryClass = (category: string, kind: "event" | "task") => `category-tag category-${kind} category-${({ "配信": "red", "作業": "orange", "連絡": "yellow", "打合せ": "blue", "交流": "green", "プライベート": "gray", "申込": "blue", "発注": "orange", "問合せ": "yellow", "提出": "red", "その他": "gray" } as Record<string, string>)[category] ?? "gray"}`;
 const dueClass = (date?: string) => {
@@ -36,7 +35,7 @@ export function LiverPlanner() {
     setState(readLiverPlannerState(localStorage.getItem(LIVER_PLANNER_STORAGE_KEY)));
     try {
       const planner = decodePlannerState(localStorage.getItem(PLANNER_STORAGE_KEY) ?? "");
-      setRankItems(Object.entries(planner?.plans ?? {}).flatMap(([date, plan]) => plan.value === "unset" ? [] : [{ date, title: rankLabel(plan.value), memo: plan.memo }]));
+      setRankItems(rankCalendarItems(planner));
     } catch { /* rank calendar is optional */ }
     setReady(true);
   }, []);
