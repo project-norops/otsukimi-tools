@@ -54,6 +54,8 @@ button {
 .liver-actions .button { min-height: 52px; padding: 7px 16px; font-size: 14px; flex-direction: column; line-height: 1.25; }
 .liver-actions .button span { font-size: 11px; font-weight: 700; opacity: .82; }
 .liver-storage-note { max-width: 100%; margin: 18px 0 0; }
+.liver-rank-note { display: grid; gap: 3px; margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--pale-pink); color: var(--sub); font-size: 12px; line-height: 1.6; }
+.liver-rank-note b { color: #c73c62; }
 .liver-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .liver-section { padding: 20px; border: 1px solid var(--border); border-radius: 22px; background: white; box-shadow: 0 8px 28px rgba(170, 82, 108, .05); min-width: 0; }
 .liver-section h2 { margin: 0 0 14px; font-size: 20px; }
@@ -72,6 +74,7 @@ button {
 .category-yellow { color: #8c6111; background: #fff3d3; }
 .category-green { color: #276837; background: var(--light-green); }
 .category-blue { color: #315f96; background: #e2eefc; }
+.category-gray { color: #5c5870; background: #f3eff1; }
 .agenda-row small, .task-row small { color: var(--sub); font-size: 12px; overflow-wrap: anywhere; }
 .agenda-row aside { display: flex; gap: 4px; }
 .agenda-row aside button, .task-row > button { border: 0; background: transparent; color: #c73c62; padding: 2px; font-size: 12px; font-weight: 800; }
