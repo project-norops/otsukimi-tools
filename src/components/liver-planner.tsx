@@ -9,7 +9,7 @@ type RankItem = RankCalendarItem;
 const today = () => formatDate(new Date());
 const download = (content: string, name: string) => { const url = URL.createObjectURL(new Blob([content], { type: "application/json" })); const link = document.createElement("a"); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); };
 const timeSort = <T extends { startTime?: string; time?: string; allDay?: boolean }>(a: T, b: T) => Number(Boolean(a.allDay)) - Number(Boolean(b.allDay)) || (a.startTime ?? a.time ?? "99:99").localeCompare(b.startTime ?? b.time ?? "99:99");
-const itemTime = (item: LiverEvent | LiverTask | RankItem) => "startTime" in item ? item.startTime ?? (item.allDay ? "98:00" : "99:00") : "time" in item ? item.time ?? "99:00" : "98:30";
+const itemTime = (item: LiverEvent | LiverTask | RankItem) => "startTime" in item ? item.startTime ?? (item.allDay ? "98:00" : "99:00") : "time" in item ? item.time ?? "99:00" : "98:00";
 const timeOptions = Array.from({ length: 48 }, (_, index) => `${String(Math.floor(index / 2)).padStart(2, "0")}:${index % 2 ? "30" : "00"}`);
 const categoryClass = (category: string, kind: "event" | "task") => `category-tag category-${kind} category-${({ "配信": "red", "作業": "orange", "連絡": "yellow", "打合せ": "blue", "交流": "green", "プライベート": "gray", "申込": "blue", "発注": "orange", "問合せ": "yellow", "提出": "red", "その他": "gray" } as Record<string, string>)[category] ?? "gray"}`;
 const dueClass = (date?: string) => {
