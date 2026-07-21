@@ -95,7 +95,7 @@ export function FanTool({ config }: { config: FanToolConfig }) {
     context.font = "700 32px sans-serif";
     context.fillText("#みてみてみれい", 540, footerY);
     context.font = "26px sans-serif";
-    context.fillText("おつきみつーるず", 540, footerY + 65);
+    context.fillText("すしうさどっとねっと", 540, footerY + 65);
     const link = document.createElement("a");
     link.download = `${config.id}-${result.id}.png`;
     link.href = canvas.toDataURL("image/png");

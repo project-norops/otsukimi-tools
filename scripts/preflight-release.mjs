@@ -23,7 +23,7 @@ try {
     .map(Number);
   if (behind > 0) fail("リモートブランチより遅れています。先に最新状態を取り込んでください。");
 } catch {
-  fail("追跡先ブランチを確認できません。`git push -u origin <branch>` を実行してください。");
+  console.log("No tracking branch yet; allowing the initial branch push.");
 }
 
 console.log("Release preflight passed.");

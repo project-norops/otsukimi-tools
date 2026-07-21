@@ -222,7 +222,7 @@
   .liver-planner .planner-actions { grid-template-columns: repeat(4, max-content); }
 }
 
-/* 手帳固有のUI。すしうさつーるず本体の配色変数だけを使用する。 */
+/* 手帳固有のUI。すしうさどっとねっと本体の配色変数だけを使用する。 */
 .liver-planner { max-width: 900px; }
 .liver-intro h1 { font-size: clamp(32px, 7vw, 54px); }
 .liver-toolbar, .liver-actions, .liver-tabs, .liver-backup, .liver-planner .month-nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
