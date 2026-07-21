@@ -1,6 +1,46 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
-export const metadata: Metadata = { title: { default: "おつきみつーるず", template: "%s | おつきみつーるず" }, description: "ライバーとリスナーのための、ちいさくて便利なツール置き場", manifest: "/manifest.webmanifest", appleWebApp: { capable: true, title: "おつきみ" }, icons: { icon: "/icon.svg", apple: "/icon.svg" } };
-export const viewport: Viewport = { themeColor: "#FF6B91", width: "device-width", initialScale: 1 };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="ja"><body><SiteHeader /><main>{children}</main><footer><p>ホーム画面に追加すると、アプリのようにすぐ使えます。</p><p>© おつきみつーるず</p></footer></body></html>; }
+
+export const metadata: Metadata = {
+  title: {
+    default: "すしうさつーるず",
+    template: "%s | すしうさつーるず",
+  },
+  description:
+    "IRIAMライバーや小規模配信者の活動に役立つ、スマホで使える無料ツールとコンテンツ。",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "すしうさつーるず" },
+  icons: {
+    icon: [
+      { url: "/brand/icons/favicon.ico" },
+      { url: "/brand/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/brand/icons/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#16473D",
+  width: "device-width",
+  initialScale: 1,
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="ja">
+      <body>
+        <SiteHeader />
+        <main>{children}</main>
+        <footer>
+          <strong>すしうさつーるず</strong>
+          <p>配信活動を、少し便利に、少し楽しく。</p>
+          <p>© すしうさつーるず</p>
+        </footer>
+      </body>
+    </html>
+  );
+}

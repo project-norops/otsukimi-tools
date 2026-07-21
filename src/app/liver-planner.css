@@ -1,0 +1,317 @@
+.liver-planner .planner-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.liver-planner .planner-page > header {
+  display: grid;
+  gap: .6rem;
+}
+
+.liver-planner .planner-page > header h1,
+.liver-planner .planner-page > header p {
+  margin: 0;
+}
+
+.liver-planner .planner-page > header p {
+  color: var(--sub);
+}
+
+.liver-planner .planner-tabs {
+  display: flex;
+  gap: .5rem;
+  overflow-x: auto;
+  padding-bottom: .15rem;
+}
+
+.liver-planner .planner-tabs button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  border-radius: 999px;
+  padding: .55rem .85rem;
+  font-size: .95rem;
+  background: var(--white);
+  color: var(--sub);
+}
+
+.liver-planner .planner-tabs button[aria-selected="true"] {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}
+
+.liver-planner .planner-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .65rem;
+}
+
+.liver-planner .planner-actions .button {
+  text-align: center;
+}
+
+.liver-planner .planner-note {
+  padding: .8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--light-green);
+  color: var(--green);
+  font-size: .9rem;
+}
+
+.liver-planner .planner-section {
+  display: grid;
+  gap: .7rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--white);
+}
+
+.liver-planner .planner-section h2,
+.liver-planner .planner-section h3,
+.liver-planner .planner-section p {
+  margin: 0;
+}
+
+.liver-planner .planner-list {
+  display: grid;
+  gap: .55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liver-planner .planner-list > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .65rem;
+  align-items: start;
+  padding: .8rem;
+  border-radius: 12px;
+  background: var(--pale-pink);
+}
+
+.liver-planner .planner-list > li > div {
+  min-width: 0;
+}
+
+.liver-planner .planner-list time,
+.liver-planner .planner-meta {
+  color: var(--sub);
+  font-size: .86rem;
+}
+
+.liver-planner .planner-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid currentColor;
+  padding: .15rem .45rem;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.liver-planner .planner-tag--event {
+  border-radius: 999px;
+}
+
+.liver-planner .planner-tag--task {
+  border-radius: 5px;
+}
+
+.liver-planner .planner-deadline {
+  font-weight: 700;
+}
+
+.liver-planner .planner-deadline--today { color: #b42318; }
+.liver-planner .planner-deadline--soon { color: #b54708; }
+.liver-planner .planner-deadline--near { color: #8a6500; }
+.liver-planner .planner-deadline--week { color: #26734d; }
+.liver-planner .planner-deadline--later { color: #2563a8; }
+
+.liver-planner .planner-empty {
+  padding: 1rem;
+  color: var(--sub);
+  text-align: center;
+}
+
+.liver-planner .planner-form {
+  display: grid;
+  gap: .85rem;
+}
+
+.liver-planner .planner-form label {
+  display: grid;
+  gap: .35rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.liver-planner .planner-form input,
+.liver-planner .planner-form select,
+.liver-planner .planner-form textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .65rem .75rem;
+  background: var(--white);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.liver-planner .planner-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.liver-planner .planner-form .inline-label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.liver-planner .planner-form .inline-label input {
+  width: auto;
+  min-height: auto;
+}
+
+.liver-planner .planner-form-help {
+  margin: -.35rem 0 0;
+  color: var(--sub);
+  font-size: .86rem;
+  font-weight: 400;
+}
+
+.liver-planner .planner-form-actions,
+.liver-planner .planner-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.liver-planner .planner-item-actions button,
+.liver-planner .planner-list input[type="checkbox"] {
+  min-width: 42px;
+  min-height: 42px;
+}
+
+.liver-planner .planner-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .3rem;
+}
+
+.liver-planner .planner-calendar-grid button {
+  min-height: 52px;
+  padding: .2rem;
+  border-radius: 10px;
+  background: var(--white);
+  font-size: .82rem;
+}
+
+.liver-planner .planner-calendar-grid button[data-has-items="true"] {
+  border-color: var(--pink);
+  background: var(--pale-pink);
+}
+
+@media (min-width: 680px) {
+  .liver-planner .planner-actions { grid-template-columns: repeat(4, max-content); }
+}
+
+/* 手帳固有のUI。すしうさつーるず本体の配色変数だけを使用する。 */
+.liver-planner { max-width: 900px; }
+.liver-intro h1 { font-size: clamp(32px, 7vw, 54px); }
+.liver-toolbar, .liver-actions, .liver-tabs, .liver-backup, .liver-planner .month-nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.liver-toolbar { justify-content: space-between; margin: 28px 0 18px; }
+.liver-tabs { padding: 5px; border-radius: 999px; background: var(--pale-pink); }
+.liver-tabs button, .liver-filter button, .liver-planner .month-nav button { border: 0; background: transparent; color: var(--sub); padding: 9px 13px; border-radius: 999px; font-weight: 800; }
+.liver-tabs button.active, .liver-filter button.active { color: var(--pink); background: var(--white); box-shadow: 0 2px 8px rgb(22 71 61 / 12%); }
+.liver-actions .button { min-height: 52px; padding: 7px 16px; font-size: 14px; flex-direction: column; line-height: 1.25; }
+.liver-actions .button span { font-size: 11px; font-weight: 700; opacity: .82; }
+.liver-storage-note { max-width: 100%; margin: 18px 0 0; }
+.liver-rank-note { display: grid; gap: 3px; margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--light-green); color: var(--sub); font-size: 12px; line-height: 1.6; }
+.liver-rank-note b { color: var(--green); }
+.liver-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.liver-section { padding: 20px; border: 1px solid var(--border); border-radius: 22px; background: var(--white); box-shadow: 0 8px 28px rgb(22 71 61 / 5%); min-width: 0; }
+.liver-section h2 { margin: 0 0 14px; font-size: 20px; }
+.liver-sections .liver-section:nth-child(2), .liver-sections .liver-section:nth-child(5) { grid-column: 1 / -1; }
+.liver-planner .agenda-list, .liver-planner .task-list { display: grid; gap: 8px; }
+.liver-planner .agenda-row, .liver-planner .task-row { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: start; gap: 10px; padding: 10px; background: var(--pale-pink); border-radius: 13px; }
+.liver-planner .agenda-row > span { color: var(--pink); font-size: 13px; font-weight: 900; }
+.liver-planner .agenda-row div, .liver-planner .task-row div { display: grid; gap: 2px; min-width: 0; }
+.liver-planner .agenda-row strong, .liver-planner .task-row strong { overflow-wrap: anywhere; }
+.liver-planner .agenda-row em, .liver-planner .task-row em { font-style: normal; font-size: 11px; font-weight: 800; }
+.liver-planner .category-tag { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; }
+.liver-planner .category-event { border-radius: 999px; }
+.liver-planner .category-task { border-radius: 7px; }
+.liver-planner .category-red { color: #9e2931; background: #fce3e4; }
+.liver-planner .category-orange { color: #b45718; background: #fff0e5; }
+.liver-planner .category-yellow { color: #8c6111; background: #fff3d3; }
+.liver-planner .category-green { color: #276837; background: var(--light-green); }
+.liver-planner .category-blue { color: #315f96; background: #e2eefc; }
+.liver-planner .category-gray { color: #5c5870; background: #f3eff1; }
+.liver-planner .agenda-row small, .liver-planner .task-row small { color: var(--sub); font-size: 12px; overflow-wrap: anywhere; }
+.liver-planner .agenda-row aside { display: flex; gap: 4px; }
+.liver-planner .agenda-row aside button, .liver-planner .task-row > button { border: 0; background: transparent; color: var(--pink); padding: 2px; font-size: 12px; font-weight: 800; }
+.liver-planner .task-row { grid-template-columns: 22px minmax(0, 1fr) auto; }
+.liver-planner .task-row input { width: 18px; height: 18px; accent-color: var(--pink); }
+.liver-planner .task-row.done strong { color: var(--sub); text-decoration: line-through; }
+.liver-planner .task-meta { display: flex !important; flex-wrap: wrap; gap: 6px; align-items: center; }
+.liver-planner .task-due { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; font-size: 11px; }
+.liver-planner .task-due.due-red { color: #9e2931; background: #fce3e4; }
+.liver-planner .task-due.due-orange { color: #b45718; background: #fff0e5; }
+.liver-planner .task-due.due-yellow { color: #8c6111; background: #fff3d3; }
+.liver-planner .task-due.due-green { color: #276837; background: var(--light-green); }
+.liver-planner .task-due.due-blue { color: #315f96; background: #e2eefc; }
+.liver-planner .liver-empty { margin: 0; padding: 12px; color: var(--sub); font-size: 13px; text-align: center; background: var(--pale-pink); border-radius: 12px; }
+.liver-planner .week-rows { display: grid; gap: 12px; }
+.liver-planner .week-row { padding-top: 12px; border-top: 1px solid var(--border); }
+.liver-planner .week-row:first-child { padding-top: 0; border-top: 0; }
+.liver-planner .week-row h3 { margin: 0 0 8px; color: var(--pink); font-size: 15px; }
+.liver-planner .week-row .task-list { margin-top: 8px; }
+.liver-filter { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 3px; }
+.liver-filter button { flex: 0 0 auto; background: var(--pale-pink); font-size: 13px; }
+.liver-planner .month-nav { justify-content: center; margin-bottom: 14px; }
+.liver-planner .month-nav button { background: var(--pale-pink); color: var(--pink); }
+.liver-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.liver-calendar > b { text-align: center; color: var(--sub); font-size: 12px; }
+.liver-calendar button { min-height: 58px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); color: var(--text); padding: 5px; display: grid; align-content: start; text-align: left; }
+.liver-calendar button.selected { border-color: var(--pink); background: var(--pale-pink); }
+.liver-calendar small { color: var(--pink); font-size: 10px; }
+.liver-planner .selected-day { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.liver-planner .selected-day h3 { margin: 0 0 10px; }
+.liver-backup { justify-content: center; margin-top: 24px; padding: 14px; background: var(--pale-pink); border-radius: 16px; font-size: 13px; }
+.liver-backup > span { color: var(--sub); font-weight: 800; }
+.liver-modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: end center; padding: 16px; background: rgb(53 37 31 / 35%); }
+.liver-editor { width: min(620px, 100%); max-height: 92vh; overflow: auto; padding: 22px; background: var(--white); border-radius: 24px; box-shadow: 0 16px 48px rgb(53 37 31 / 22%); }
+.liver-editor header, .liver-editor footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.liver-editor h2 { margin: 0; font-size: 22px; }
+.liver-editor header > button { border: 0; background: transparent; color: var(--pink); font-weight: 800; }
+.liver-planner .editor-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.liver-planner .editor-fields label { display: grid; gap: 6px; color: var(--sub); font-size: 13px; font-weight: 800; }
+.liver-planner .editor-fields label:has(textarea), .liver-planner .editor-fields label:first-child { grid-column: 1 / -1; }
+.liver-planner .editor-fields input, .liver-planner .editor-fields select, .liver-planner .editor-fields textarea { width: 100%; min-height: 44px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); color: var(--text); font-size: 16px; }
+.liver-planner .editor-fields textarea { min-height: 92px; resize: vertical; }
+.liver-planner .time-select-note { grid-column: 1 / -1; margin: 0; color: var(--sub); font-size: 12px; font-weight: 700; }
+.liver-planner .editor-fields .check-label { display: flex; align-items: center; gap: 8px; }
+.liver-planner .editor-fields .check-label input { width: 18px; min-height: auto; }
+.liver-planner .delete-button { border: 0; background: transparent; color: var(--warning); font-weight: 800; }
+
+@media (max-width: 640px) {
+  .liver-toolbar { align-items: stretch; }
+  .liver-tabs { width: 100%; justify-content: space-between; gap: 2px; }
+  .liver-tabs button { padding: 8px 9px; font-size: 12px; }
+  .liver-actions { width: 100%; }
+  .liver-actions .button { flex: 1; }
+  .liver-sections { grid-template-columns: 1fr; }
+  .liver-sections .liver-section:nth-child(2), .liver-sections .liver-section:nth-child(5) { grid-column: auto; }
+  .liver-section { padding: 16px; }
+  .liver-planner .agenda-row { grid-template-columns: 48px minmax(0, 1fr); }
+  .liver-planner .agenda-row aside { grid-column: 2; }
+  .liver-planner .editor-fields { grid-template-columns: 1fr; }
+  .liver-planner .editor-fields label { grid-column: auto !important; }
+}

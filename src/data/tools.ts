@@ -1,8 +1,9 @@
 export type Audience = "liver" | "listener";
 export interface ToolMetadata { id: string; name: string; description: string; audiences: Audience[]; status: "available" | "in_development"; href?: string; listed?: boolean }
 export const tools: ToolMetadata[] = [
-  { id: "rank-calendar", name: "ランク計画カレンダー", description: "日別スコアとスキパから、3か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
-  { id: "liver-planner", name: "ライバー手帳（仮）", description: "配信予定、制作、締切やプライベートの予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner", listed: false },
+  { id: "rank-calendar", name: "IRIAMランク管理カレンダー", description: "日別スコアとスキパから、1〜6か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
+  { id: "liver-planner", name: "ライバー手帳（仮）", description: "配信予定・タスク・プライベート予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner", listed: false },
+  { id: "clipper", name: "10秒動画メイカー", description: "「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール。", audiences: ["liver"], status: "available", href: "/tools/clipper" },
   { id: "daily-mirei", name: "本日の美玲ちゃん", description: "今日の美玲ちゃんを楽しく観測。可愛さはいつでも120%。", audiences: ["liver", "listener"], status: "available", href: "/tools/daily-mirei" },
   { id: "tsukimikko-fortune", name: "つきみっこ専用くじ", description: "今日のコンディションに、美玲ちゃんバフをひとつ。", audiences: ["listener"], status: "available", href: "/tools/tsukimikko-fortune" },
   { id: "mirei-alert", name: "美玲ちゃん注意報", description: "何をしていても結局刺さる。今日の注意報を観測します。", audiences: ["liver", "listener"], status: "available", href: "/tools/mirei-alert" },
@@ -13,8 +14,23 @@ export const tools: ToolMetadata[] = [
   { id: "schedule-image", name: "配信スケジュール共有画像", description: "配信予定をSNSで共有しやすい画像にします。", audiences: ["liver"], status: "in_development" },
   { id: "icon-ring", name: "アイコンリング装着ツール", description: "アイコン画像に透過PNGリングを重ね、513×513pxで保存します。", audiences: ["liver", "listener"], status: "available", href: "/tools/icon-ring" },
   { id: "event-split", name: "イベント告知4分割画像", description: "既存素材を4分割投稿向けに整えます。", audiences: ["liver"], status: "in_development" },
-  { id: "event-goal", name: "イベント目標逆算", description: "目標と残り期間から必要ポイントを逆算します。", audiences: ["liver", "listener"], status: "in_development" }
+  { id: "event-goal", name: "イベント目標逆算", description: "目標と残り期間から必要ポイントを逆算します。", audiences: ["liver", "listener"], status: "in_development" },
+  { id: "gacha-planner", name: "ガチャ設定シミュレーター", description: "ポイント・原価・収支・在庫リスクを確認し、リスナー向け告知PNGも自動生成します。", audiences: ["liver"], status: "available", href: "/tools/gacha-planner" }
 ];
 
 /** ポータルには、現在利用できるツールだけを掲載する。 */
 export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href && tool.listed !== false);
+
+const homeToolIds = [
+  "rank-calendar",
+  "icon-ring",
+  "daily-mirei",
+  "liver-match",
+  "mirei-alert",
+] as const;
+
+/** トップページには、オーナーが選定したツールだけを指定順で掲載する。 */
+export const homeTools = homeToolIds.flatMap((id) => {
+  const tool = availableTools.find((candidate) => candidate.id === id);
+  return tool ? [tool] : [];
+});
