@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "review:fan-results:import": "node scripts/import-reviewed-fan-results.mjs",
-    "check": "npm run test && npm run typecheck && npm run lint && npm run build"
+    "check": "npm run test && npm run typecheck && npm run lint && npm run build",
+    "preflight:release": "node scripts/preflight-release.mjs"
   },
   "dependencies": {
     "@ffmpeg/core": "^0.12.10",
