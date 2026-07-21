@@ -3,7 +3,7 @@ import type { DayPlan, PlannerInput } from "@/types/planner";
 import { simulate } from "./simulator";
 import { createRankBandSegments } from "./rank-bands";
 
-const input: PlannerInput = { baseDate: "2026-07-30", rank: "S1", score: 12, remainingDaysDisplay: 6, skipPasses: 0 };
+const input: PlannerInput = { baseDate: "2026-07-30", rank: "S1", score: 12, remainingDaysDisplay: 6, skipPasses: 0, simulationMonths: 1 };
 const plan = (entries: Array<[string, DayPlan["value"]]>) => Object.fromEntries(entries.map(([date, value]) => [date, { value }]));
 
 describe("rank band segments", () => {

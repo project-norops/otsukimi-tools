@@ -15,5 +15,13 @@ export function generateAnniversaries(debutDate: string, startDate: string, endD
   for (let months = 12; ; months += 6) { const date = addMonthsClamped(debutDate, months); if (date > endDate) break; if (inRange(date)) results.push({ date, label: calendarLabel(months), kind: "calendar" }); }
   const endDays = Math.ceil((parseDate(endDate).getTime() - parseDate(debutDate).getTime()) / 86400000);
   for (let days = 100; days <= endDays; days += 100) { const date = addDays(debutDate, days); if (inRange(date)) results.push({ date, label: `${days}日記念`, kind: "days" }); }
+  for (let digits = 3; digits <= String(Math.max(0, endDays)).length; digits += 1) {
+    for (let repeatedDigit = 1; repeatedDigit <= 9; repeatedDigit += 1) {
+      const days = Number(String(repeatedDigit).repeat(digits));
+      if (days > endDays) continue;
+      const date = addDays(debutDate, days);
+      if (inRange(date)) results.push({ date, label: `${days}日記念`, kind: "days" });
+    }
+  }
   return results.sort((a, b) => a.date.localeCompare(b.date));
 }

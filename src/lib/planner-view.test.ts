@@ -3,7 +3,7 @@ import type { DayPlan, PlannerInput } from "@/types/planner";
 import { simulate } from "./simulator";
 import { getActionErrors, getNextRankDecision, getRankProgress } from "./planner-view";
 
-const base: PlannerInput = { baseDate: "2026-07-14", rank: "S1", score: 0, remainingDaysDisplay: 6, skipPasses: 0 };
+const base: PlannerInput = { baseDate: "2026-07-14", rank: "S1", score: 0, remainingDaysDisplay: 6, skipPasses: 0, simulationMonths: 1 };
 const plans = (...values: DayPlan["value"][]) => Object.fromEntries(values.map((value, index) => [`2026-07-${String(14 + index).padStart(2, "0")}`, { value }]));
 
 describe("planner daily rank display", () => {

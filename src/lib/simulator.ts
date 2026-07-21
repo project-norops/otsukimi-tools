@@ -1,9 +1,9 @@
-import type { DayPlan, PlannerInput, RankEvent, SimulationResult, Warning } from "@/types/planner";
+import type { DayPlan, PlannerInput, PlanValue, RankEvent, SimulationResult, Warning } from "@/types/planner";
 import { addDays, parseDate } from "./date-utils";
 import { moveRank, RANK_RULES, remainingCalculationDays } from "./rank-rules";
 import { applySkipPassGrants } from "./skip-pass";
 
-const emptyPlan = (): DayPlan => ({ value: "unset" });
+const emptyPlan = (defaultValue: PlanValue): DayPlan => ({ value: defaultValue });
 export function validateInput(input: PlannerInput): Warning[] {
   const warnings: Warning[] = [];
   if (input.score < 0 || input.score > 17) warnings.push({ level: "error", message: "累計スコアは0〜17で入力してください。" });
@@ -11,12 +11,12 @@ export function validateInput(input: PlannerInput): Warning[] {
   if (input.skipPasses < 0 || input.skipPasses > 10) warnings.push({ level: "error", message: "スキップパスは0〜10枚で入力してください。" });
   return warnings;
 }
-export function simulate(input: PlannerInput, plans: Record<string, DayPlan>, totalDays = 92): SimulationResult {
+export function simulate(input: PlannerInput, plans: Record<string, DayPlan>, totalDays = 92, defaultValue: PlanValue = "unset"): SimulationResult {
   const days: SimulationResult["days"] = []; const warnings = validateInput(input);
   let rank = input.rank, score = input.score, skipPasses = input.skipPasses;
   let periodRemaining = remainingCalculationDays(input.remainingDaysDisplay);
   for (let offset = 0; offset < totalDays; offset++) {
-    const date = addDays(input.baseDate, offset); const plan = plans[date] ?? emptyPlan(); const rankBefore = rank; const scoreBefore = score;
+    const date = addDays(input.baseDate, offset); const plan = plans[date] ?? emptyPlan(defaultValue); const rankBefore = rank; const scoreBefore = score;
     const isMonday = parseDate(date).getDay() === 1;
     const grants = applySkipPassGrants(skipPasses, isMonday && (plan.weeklyGrant ?? true), plan.manualGrant ?? 0);
     skipPasses = grants.total;

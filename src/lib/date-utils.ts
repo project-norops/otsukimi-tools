@@ -14,3 +14,11 @@ export function addMonthsClamped(value: string, months: number): string {
   const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
   target.setDate(Math.min(day, last)); return formatDate(target);
 }
+export function startOfMonth(value: string): string {
+  const date = parseDate(value);
+  return formatDate(new Date(date.getFullYear(), date.getMonth(), 1));
+}
+export function endOfMonth(value: string): string {
+  const date = parseDate(value);
+  return formatDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+}

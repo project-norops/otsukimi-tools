@@ -5,7 +5,7 @@ import { remainingCalculationDays } from "./rank-rules";
 import { applySkipPassGrants } from "./skip-pass";
 import { addDays } from "./date-utils";
 
-const base: PlannerInput = { baseDate: "2026-07-14", rank: "S1", score: 0, remainingDaysDisplay: 6, skipPasses: 0 };
+const base: PlannerInput = { baseDate: "2026-07-14", rank: "S1", score: 0, remainingDaysDisplay: 6, skipPasses: 0, simulationMonths: 1 };
 const scores = (...values: DayPlan["value"][]) => Object.fromEntries(values.map((value, i) => [`2026-07-${String(14 + i).padStart(2, "0")}`, { value }]));
 describe("rank simulator", () => {
   it("treats あと6日 as seven calculation days", () => expect(remainingCalculationDays(6)).toBe(7));
@@ -17,6 +17,10 @@ describe("rank simulator", () => {
   it("grants weekly pass on Monday and caps at ten", () => { const monday = simulate({ ...base, baseDate: "2026-07-13" }, {}, 1); expect(monday.days[0].skipPasses).toBe(1); expect(applySkipPassGrants(10, true).total).toBe(10); });
   it("handles multiple rank outcomes over three months", () => { const plans: Record<string, DayPlan> = {}; const date = new Date(2026, 6, 14); for (let i=0;i<92;i++) { plans[date.toLocaleDateString("sv-SE")] = { value: i < 21 ? 6 : i < 49 ? 2 : "rest" }; date.setDate(date.getDate()+1); } const events = simulate({ ...base, rank: "B1" }, plans, 92).days.flatMap(d => d.rankEvent?.type ?? []); expect(events).toContain("up"); expect(events).toContain("keep"); expect(events).toContain("down"); });
   it("does not exceed S3 or drop below D", () => { expect(simulate({ ...base, rank: "S3", score: 17 }, scores(1), 1).days[0].rankAfter).toBe("S3"); expect(simulate({ ...base, rank: "D" }, {}, 7).days[6].rankAfter).toBe("D"); });
+  it("uses an explicit default score without changing legacy unset behavior", () => {
+    expect(simulate(base, {}, 1).days[0].plan.value).toBe("unset");
+    expect(simulate(base, {}, 1, 1).days[0].plan.value).toBe(1);
+  });
   it("combines weekly and manual grants and caps at ten", () => expect(applySkipPassGrants(8, true, 3)).toEqual({ total: 10, weeklyGrant: 1, manualGrant: 3 }));
   it.each(["2026-07-14", "2026-08-01", "2026-07-15", "2026-07-28"])("extends the decision date for a valid SKIP from %s", (baseDate) => {
     const input = { ...base, baseDate, skipPasses: 1 };
