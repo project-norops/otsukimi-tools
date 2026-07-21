@@ -1,14 +1,13 @@
-import { RANKS, type DayPlan, type PlannerInput, type PlanValue } from "@/types/planner";
+import { RANKS, type DayPlan, type PlannerInput, type PlanValue, type SimulationMonths } from "@/types/planner";
 
-export const PLANNER_STORAGE_KEY = "otsukimi-tools:rank-planner";
-export const PLANNER_STATE_VERSION = 1;
+export const PLANNER_STORAGE_KEY = "sushiusa-tools:iriam-rank-calendar:v2";
+export const LEGACY_PLANNER_STORAGE_KEY = "otsukimi-tools:rank-planner";
+export const PLANNER_STATE_VERSION = 2;
 export const PLANNER_MEMO_LIMIT = 10;
 
 export type PlannerPersistedState = {
-  version: 1;
+  version: 2;
   input: PlannerInput;
-  draft: PlannerInput;
-  started: boolean;
   plans: Record<string, DayPlan>;
 };
 
@@ -24,14 +23,16 @@ function normalizeInput(value: unknown): PlannerInput | undefined {
   if (!isRecord(value) || !isDate(value.baseDate) || typeof value.rank !== "string" || !RANKS.includes(value.rank as PlannerInput["rank"])) return undefined;
   const score = boundedInteger(value.score, 0, 17);
   const remainingDaysDisplay = boundedInteger(value.remainingDaysDisplay, 0, 6);
-  const skipPasses = boundedInteger(value.skipPasses, 0, 999);
-  if (score === undefined || remainingDaysDisplay === undefined || skipPasses === undefined) return undefined;
+  const skipPasses = boundedInteger(value.skipPasses, 0, 10);
+  const simulationMonths = typeof value.simulationMonths === "number" && Number.isInteger(value.simulationMonths) && value.simulationMonths >= 1 && value.simulationMonths <= 6 ? value.simulationMonths : undefined;
+  if (score === undefined || remainingDaysDisplay === undefined || skipPasses === undefined || simulationMonths === undefined) return undefined;
   return {
     baseDate: value.baseDate,
     rank: value.rank as PlannerInput["rank"],
     score,
     remainingDaysDisplay,
     skipPasses,
+    simulationMonths: Math.min(3, simulationMonths) as SimulationMonths,
     planName: optionalText(value.planName, 30),
     displayName: optionalText(value.displayName, 30),
     debutDate: isDate(value.debutDate) ? value.debutDate : undefined,
@@ -56,9 +57,8 @@ function normalizePlans(value: unknown): Record<string, DayPlan> {
 export function normalizePlannerState(value: unknown): PlannerPersistedState | undefined {
   if (!isRecord(value) || value.version !== PLANNER_STATE_VERSION) return undefined;
   const input = normalizeInput(value.input);
-  const draft = normalizeInput(value.draft);
-  if (!input || !draft || typeof value.started !== "boolean") return undefined;
-  return { version: PLANNER_STATE_VERSION, input, draft, started: value.started, plans: normalizePlans(value.plans) };
+  if (!input) return undefined;
+  return { version: PLANNER_STATE_VERSION, input, plans: normalizePlans(value.plans) };
 }
 
 export function encodePlannerState(state: PlannerPersistedState) {
