@@ -65,10 +65,13 @@ button {
 .agenda-row strong, .task-row strong { overflow-wrap: anywhere; }
 .agenda-row em, .task-row em { font-style: normal; font-size: 11px; font-weight: 800; }
 .category-tag { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; }
-.category-stream, .category-notice { color: #c73c62; background: var(--soft-pink); }
-.category-project, .category-create { color: #8c6111; background: #fff3d3; }
-.category-deadline, .category-shipping { color: #b45718; background: #fff0e5; }
-.category-private, .category-other { color: #5c5870; background: #f3eff1; }
+.category-event { border-radius: 999px; }
+.category-task { border-radius: 7px; }
+.category-red { color: #9e2931; background: #fce3e4; }
+.category-orange { color: #b45718; background: #fff0e5; }
+.category-yellow { color: #8c6111; background: #fff3d3; }
+.category-green { color: #276837; background: var(--light-green); }
+.category-blue { color: #315f96; background: #e2eefc; }
 .agenda-row small, .task-row small { color: var(--sub); font-size: 12px; overflow-wrap: anywhere; }
 .agenda-row aside { display: flex; gap: 4px; }
 .agenda-row aside button, .task-row > button { border: 0; background: transparent; color: #c73c62; padding: 2px; font-size: 12px; font-weight: 800; }
@@ -76,9 +79,12 @@ button {
 .task-row input { width: 18px; height: 18px; accent-color: var(--pink); }
 .task-row.done strong { color: var(--sub); text-decoration: line-through; }
 .task-meta { display: flex !important; flex-wrap: wrap; gap: 6px; align-items: center; }
-.task-due { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; background: var(--soft-pink); color: #c73c62; font-size: 11px; }
-.task-due.due-soon { background: #fff3d3; color: #8c6111; }
-.task-due.due-today { background: #ffe2db; color: #b45718; }
+.task-due { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; font-size: 11px; }
+.task-due.due-red { color: #9e2931; background: #fce3e4; }
+.task-due.due-orange { color: #b45718; background: #fff0e5; }
+.task-due.due-yellow { color: #8c6111; background: #fff3d3; }
+.task-due.due-green { color: #276837; background: var(--light-green); }
+.task-due.due-blue { color: #315f96; background: #e2eefc; }
 .liver-empty { margin: 0; padding: 12px; color: var(--sub); font-size: 13px; text-align: center; background: var(--pale-pink); border-radius: 12px; }
 .week-rows { display: grid; gap: 12px; }
 .week-row { padding-top: 12px; border-top: 1px solid var(--border); }

@@ -3,8 +3,8 @@ import { LIVER_PLANNER_VERSION, addDays, normalizeLiverPlannerState, readLiverPl
 
 describe("liver planner storage", () => {
   it("normalizes valid saved data and ignores malformed entries", () => {
-    const state = normalizeLiverPlannerState({ version: LIVER_PLANNER_VERSION, events: [{ id: "e", title: "通院", date: "2026-07-22", allDay: false, category: "プライベート" }, { title: "", date: "bad" }], tasks: [{ id: "t", title: "告知", dueDate: "2026-07-23", category: "告知", priority: "高", completed: false }] });
-    expect(state?.events).toHaveLength(1); expect(state?.tasks[0].priority).toBe("高");
+    const state = normalizeLiverPlannerState({ version: LIVER_PLANNER_VERSION, events: [{ id: "e", title: "通院", date: "2026-07-22", allDay: false, category: "プライベート" }, { title: "", date: "bad" }], tasks: [{ id: "t", title: "告知", dueDate: "2026-07-23", category: "告知", completed: false }] });
+    expect(state?.events).toHaveLength(1); expect(state?.tasks[0].category).toBe("問合せ");
   });
   it("returns an empty state for corrupt JSON", () => {
     expect(readLiverPlannerState("not json").events).toEqual([]);
