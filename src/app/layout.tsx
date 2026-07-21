@@ -4,13 +4,13 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: {
-    default: "すしうさつーるず",
-    template: "%s | すしうさつーるず",
+    default: "すしうさどっとねっと",
+    template: "%s | すしうさどっとねっと",
   },
   description:
     "IRIAMライバーや小規模配信者の活動に役立つ、スマホで使える無料ツールとコンテンツ。",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "すしうさつーるず" },
+  appleWebApp: { capable: true, title: "すしうさどっとねっと" },
   icons: {
     icon: [
       { url: "/brand/icons/favicon.ico" },
@@ -36,9 +36,10 @@ export default function RootLayout({
         <SiteHeader />
         <main>{children}</main>
         <footer>
-          <strong>すしうさつーるず</strong>
+          <strong>すしうさどっとねっと</strong>
           <p>配信活動を、少し便利に、少し楽しく。</p>
-          <p>© すしうさつーるず</p>
+          <p>キャラクター制作　月乃美玲</p>
+          <p>© すしうさどっとねっと</p>
         </footer>
       </body>
     </html>
