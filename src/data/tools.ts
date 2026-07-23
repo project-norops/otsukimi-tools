@@ -2,7 +2,7 @@ export type Audience = "liver" | "listener";
 export interface ToolMetadata { id: string; name: string; description: string; audiences: Audience[]; status: "available" | "in_development"; href?: string; listed?: boolean }
 export const tools: ToolMetadata[] = [
   { id: "rank-calendar", name: "IRIAMランク管理カレンダー", description: "日別スコアとスキパから、1〜6か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
-  { id: "liver-planner", name: "ライバー手帳（仮）", description: "配信予定・タスク・プライベート予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner", listed: false },
+  { id: "liver-planner", name: "ライバー手帳", description: "配信予定・タスク・プライベート予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner" },
   { id: "clipper", name: "10秒動画メイカー", description: "「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール。", audiences: ["liver"], status: "available", href: "/tools/clipper" },
   { id: "daily-mirei", name: "本日の美玲ちゃん", description: "今日の美玲ちゃんを楽しく観測。可愛さはいつでも120%。", audiences: ["liver", "listener"], status: "available", href: "/tools/daily-mirei" },
   { id: "tsukimikko-fortune", name: "つきみっこ専用くじ", description: "今日のコンディションに、美玲ちゃんバフをひとつ。", audiences: ["listener"], status: "available", href: "/tools/tsukimikko-fortune" },
@@ -23,6 +23,7 @@ export const availableTools = tools.filter((tool) => tool.status === "available"
 
 const homeToolIds = [
   "rank-calendar",
+  "liver-planner",
   "clipper",
   "gacha-planner",
   "icon-ring",

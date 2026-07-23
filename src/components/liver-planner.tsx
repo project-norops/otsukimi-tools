@@ -60,7 +60,7 @@ export function LiverPlanner() {
   const importJson = async (file?: File) => { if (!file) return; try { const saved = readLiverPlannerState(await file.text()); setState(saved); setNotice("保存していた手帳を復元しました。"); } catch { setNotice("保存ファイルを読み込めませんでした。"); } };
 
   return <section className="liver-planner planner-shell">
-    <div className="tool-intro liver-intro"><span className="eyebrow">liver planner</span><h1>ライバー手帳（仮）</h1><p>予定は配信や外出などのスケジュール。タスクは締切や期日のある作業です。</p></div>
+    <div className="tool-intro liver-intro"><span className="eyebrow">liver planner</span><h1>ライバー手帳</h1><p>予定は配信や外出などのスケジュール。タスクは締切や期日のある作業です。</p></div>
     <aside className="planner-persistence-notice liver-storage-note">入力内容はこの端末に自動保存され、サイトには送信されません。</aside>
     <aside className="liver-rank-note"><b>IRIAMランク管理カレンダーと連携</b><span>ランク管理カレンダーに入力した配信予定は、この手帳に自動で表示されます。</span></aside>
     <div className="liver-toolbar"><div className="liver-tabs" aria-label="表示切替">{([ ["home", "ホーム"], ["week", "今週"], ["ten", "直近10日"], ["month", "月" ]] as const).map(([key, label]) => <button type="button" className={tab === key ? "active" : ""} onClick={() => setTab(key)} key={key}>{label}</button>)}</div><div className="liver-actions"><button className="button secondary" type="button" onClick={() => setEditing({ kind: "event" })}>予定を登録<span>配信や外出などのスケジュール</span></button><button className="button" type="button" onClick={() => setEditing({ kind: "task" })}>タスクを登録<span>締切や期日のある作業</span></button></div></div>
