@@ -30,6 +30,37 @@ export function stampsUntilNextGrade(completed: number) {
   return next ? Math.max(0, next.threshold - completed) : 0;
 }
 
+export type PassportTemplate = {
+  hostName: string;
+  passportTitle: string;
+  missions: string[];
+};
+
+export function encodePassportTemplate(template: PassportTemplate) {
+  const normalized: PassportTemplate = {
+    hostName: template.hostName.slice(0, 24),
+    passportTitle: template.passportTitle.slice(0, 32),
+    missions: template.missions.slice(0, 10).map((mission) => mission.slice(0, 32)),
+  };
+  const bytes = new TextEncoder().encode(JSON.stringify(normalized));
+  const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/u, "");
+}
+
+export function decodePassportTemplate(value: string): PassportTemplate | null {
+  try {
+    const padded = value.replaceAll("-", "+").replaceAll("_", "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+    const bytes = Uint8Array.from(atob(padded), (character) => character.charCodeAt(0));
+    const parsed = JSON.parse(new TextDecoder().decode(bytes)) as Partial<PassportTemplate>;
+    if (typeof parsed.hostName !== "string" || typeof parsed.passportTitle !== "string" || !Array.isArray(parsed.missions)) return null;
+    const missions = parsed.missions.filter((mission): mission is string => typeof mission === "string").slice(0, 10);
+    if (!missions.length) return null;
+    return { hostName: parsed.hostName.slice(0, 24), passportTitle: parsed.passportTitle.slice(0, 32), missions: missions.map((mission) => mission.slice(0, 32)) };
+  } catch {
+    return null;
+  }
+}
+
 export type RewardStatus = "todo" | "making" | "checking" | "sent";
 
 export const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {

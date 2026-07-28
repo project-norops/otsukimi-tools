@@ -19,7 +19,7 @@ export function SiteHeader() {
           <span className="brand-wordmark-orange">ねっと</span>
         </span>
       </Link>
-      <Link className="header-home" href="/#tools">ツール一覧</Link>
+      <Link className="header-home" href="/#memories">体験とツール</Link>
     </header>
   );
 }
