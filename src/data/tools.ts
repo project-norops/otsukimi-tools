@@ -25,11 +25,20 @@ export const tools: ToolMetadata[] = [
 /** ポータルには、現在利用できるツールだけを掲載する。 */
 export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href && tool.listed !== false);
 
-const homeToolIds = [
+const memoryExperienceIds = [
   "oshi-passport",
   "fan-awards",
   "project-relay",
   "reward-board",
+] as const;
+
+/** 思い出を育てる体験は、実務ツールと分けてトップに掲載する。 */
+export const memoryExperiences = memoryExperienceIds.flatMap((id) => {
+  const tool = availableTools.find((candidate) => candidate.id === id);
+  return tool ? [tool] : [];
+});
+
+const homeToolIds = [
   "rank-calendar",
   "liver-planner",
   "clipper",
@@ -40,7 +49,7 @@ const homeToolIds = [
   "mirei-alert",
 ] as const;
 
-/** トップページには、オーナーが選定したツールだけを指定順で掲載する。 */
+/** ツール欄には、実務を助けるツールだけを指定順で掲載する。 */
 export const homeTools = homeToolIds.flatMap((id) => {
   const tool = availableTools.find((candidate) => candidate.id === id);
   return tool ? [tool] : [];

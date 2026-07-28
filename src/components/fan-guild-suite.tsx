@@ -4,6 +4,8 @@ import Link from "next/link";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import {
   FAN_GUILD_STORAGE_KEY,
+  decodePassportTemplate,
+  encodePassportTemplate,
   getNextPassportGrade,
   getPassportGrade,
   PASSPORT_GRADES,
@@ -15,15 +17,15 @@ import {
   type RewardStatus,
 } from "@/lib/fan-guild";
 
-const MODE_META: Record<GuildMode, { label: string; short: string; href: string; mark: string }> = {
-  passport: { label: "推し枠パスポート", short: "育てる", href: "/tools/oshi-passport", mark: "P" },
-  awards: { label: "月末ファン表彰式", short: "称える", href: "/tools/fan-awards", mark: "A" },
-  relay: { label: "企画リレー", short: "つながる", href: "/tools/project-relay", mark: "R" },
-  rewards: { label: "返礼かんばん", short: "届ける", href: "/tools/reward-board", mark: "G" },
+const MODE_META: Record<GuildMode, { label: string; short: string; href: string; mark: string; audience: string; purpose: string }> = {
+  passport: { label: "推し枠パスポート", short: "育てる", href: "/tools/oshi-passport", mark: "P", audience: "ライバーが作成 → 全リスナー向け", purpose: "ライバーが枠専用ミッションを作り、共有されたリスナーが自分の端末で進めます。" },
+  awards: { label: "月末ファン表彰式", short: "称える", href: "/tools/fan-awards", mark: "A", audience: "ライバーから特定リスナーへ", purpose: "一人のリスナーへ感謝を込めた表彰カードを贈るための体験です。" },
+  relay: { label: "企画リレー", short: "つながる", href: "/tools/project-relay", mark: "R", audience: "全リスナーに共有", purpose: "参加ライバー、日程、枠の開始時刻を、みんなが見られるリレー表にします。" },
+  rewards: { label: "返礼かんばん", short: "届ける", href: "/tools/reward-board", mark: "G", audience: "ライバー作業用・非公開", purpose: "リスナーへ見せず、返礼の制作状況と期限をライバーの端末内だけで管理します。" },
 };
 
 type Mission = { id: string; label: string; done: boolean };
-type RelayMember = { id: string; name: string; date: string; done: boolean };
+type RelayMember = { id: string; name: string; date: string; time?: string; done: boolean };
 type RewardItem = { id: string; listener: string; reward: string; due: string; status: RewardStatus };
 type GuildState = {
   hostName: string;
@@ -56,9 +58,9 @@ const defaults: GuildState = {
   relayTitle: "夏色ボイスリレー",
   relayTag: "#IRIAM夏色リレー",
   relayMembers: [
-    { id: "relay-1", name: "月見みれい", date: "7/29", done: true },
-    { id: "relay-2", name: "星乃しおり", date: "7/30", done: false },
-    { id: "relay-3", name: "甘羽ここあ", date: "7/31", done: false },
+    { id: "relay-1", name: "月見みれい", date: "7/29", time: "21:00", done: true },
+    { id: "relay-2", name: "星乃しおり", date: "7/30", time: "20:30", done: false },
+    { id: "relay-3", name: "甘羽ここあ", date: "7/31", time: "22:00", done: false },
   ],
   rewards: [
     { id: "reward-1", listener: "うさぎさん", reward: "お礼ボイス", due: "2026-08-03", status: "making" },
@@ -154,6 +156,8 @@ export function FanGuildSuite({ initialMode }: { initialMode: GuildMode }) {
   const [state, setState] = useState<GuildState>(defaults);
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState("");
+  const [activeStorageKey, setActiveStorageKey] = useState("");
+  const [sharedPassport, setSharedPassport] = useState(false);
   const completed = state.missions.filter((mission) => mission.done).length;
   const grade = getPassportGrade(completed);
   const nextGrade = getNextPassportGrade(completed);
@@ -163,35 +167,52 @@ export function FanGuildSuite({ initialMode }: { initialMode: GuildMode }) {
   useEffect(() => {
     queueMicrotask(() => {
       try {
-        const saved = localStorage.getItem(FAN_GUILD_STORAGE_KEY);
-        if (saved) setState({ ...defaults, ...JSON.parse(saved) });
-      } catch { /* keep a usable default */ }
+        const shareValue = new URLSearchParams(window.location.search).get("pass") ?? "";
+        const template = decodePassportTemplate(shareValue);
+        const storageKey = template ? `${FAN_GUILD_STORAGE_KEY}:passport:${shareValue}` : FAN_GUILD_STORAGE_KEY;
+        const savedValue = localStorage.getItem(storageKey);
+        const saved = savedValue ? { ...defaults, ...JSON.parse(savedValue) } as GuildState : defaults;
+        if (template) {
+          setSharedPassport(true);
+          setState({ ...saved, hostName: template.hostName, passportTitle: template.passportTitle, listenerName: savedValue && saved.listenerName !== defaults.listenerName ? saved.listenerName : "", missions: template.missions.map((label, index) => ({ id: `mission-${index}`, label, done: savedValue ? saved.missions?.[index]?.done ?? false : false })) });
+        } else setState(saved);
+        setActiveStorageKey(storageKey);
+      } catch { setActiveStorageKey(FAN_GUILD_STORAGE_KEY); }
       setReady(true);
     });
   }, []);
-  useEffect(() => { if (ready) localStorage.setItem(FAN_GUILD_STORAGE_KEY, JSON.stringify(state)); }, [ready, state]);
+  useEffect(() => { if (ready && activeStorageKey) localStorage.setItem(activeStorageKey, JSON.stringify(state)); }, [activeStorageKey, ready, state]);
 
   const patch = <K extends keyof GuildState>(key: K, value: GuildState[K]) => setState((current) => ({ ...current, [key]: value }));
   const announce = (message: string) => { setToast(message); window.setTimeout(() => setToast(""), 2400); };
   const copy = async (value: string) => { await navigator.clipboard.writeText(value); announce("共有文をコピーしました"); };
+  const sharePassport = async () => {
+    const token = encodePassportTemplate({ hostName: state.hostName, passportTitle: state.passportTitle, missions: state.missions.map((mission) => mission.label) });
+    const url = `${window.location.origin}/tools/oshi-passport?pass=${token}`;
+    await navigator.clipboard.writeText(url);
+    announce("リスナー用URLをコピーしました");
+  };
 
   return <main className="guild-shell">
     <header className="guild-hero">
-      <div><p className="guild-kicker">FAN EXPERIENCE SUITE</p><h1>好きな枠で過ごした時間を、<em>特別な証</em>に。</h1><p>育てる、称える、つながる、届ける。リスナーとの思い出を一度きりにしない4つのツールです。</p></div>
+      <div><p className="guild-kicker">FOR MEMORIES</p><h1>好きな枠で過ごした時間を、<em>特別な証</em>に。</h1><p>育てる、称える、つながる、届ける。リスナーとの思い出を一度きりにしない4つの体験です。</p></div>
       <div className="guild-hero-seal"><span>✦</span><b>MEMORIES<br/>BECOME<br/>TREASURES</b></div>
     </header>
 
-    <nav className="guild-mode-nav" aria-label="ファン体験ツール">
+    <nav className="guild-mode-nav" aria-label="思い出体験メニュー">
       {(Object.keys(MODE_META) as GuildMode[]).map((mode) => <Link key={mode} href={MODE_META[mode].href} className={mode === initialMode ? "is-active" : ""} aria-current={mode === initialMode ? "page" : undefined}><span>{MODE_META[mode].mark}</span><small>{MODE_META[mode].short}</small><b>{MODE_META[mode].label}</b></Link>)}
     </nav>
 
     <p className="guild-privacy">入力内容はこの端末だけに自動保存されます。IRIAMとの連携やサーバー送信はありません。</p>
+    <aside className={`guild-usage-guide usage-${initialMode}`}><span>{MODE_META[initialMode].mark}</span><div><b>{MODE_META[initialMode].audience}</b><p>{MODE_META[initialMode].purpose}</p></div></aside>
 
     {initialMode === "passport" && <section className="guild-workspace">
       <div className="guild-section-heading"><div><span>01 / GROW</span><h2>推し枠パスポート</h2><p>思い出を集めるほど、カードが豪華に進化します。</p></div><div className="guild-progress-badge"><b>{completed}</b><span>MEMORIES</span></div></div>
       <div className="guild-two-column">
-        <div className="guild-panel guild-editor"><h3>パスポート設定</h3><div className="guild-form-grid"><label>ライバー名<input value={state.hostName} maxLength={24} onChange={(e) => patch("hostName", e.target.value)} /></label><label>リスナー名<input value={state.listenerName} maxLength={24} onChange={(e) => patch("listenerName", e.target.value)} /></label><label className="wide">枠・王国の名前<input value={state.passportTitle} maxLength={32} onChange={(e) => patch("passportTitle", e.target.value)} /></label></div>
-          <div className="guild-missions"><div className="guild-panel-title"><h3>思い出ミッション</h3><span>{completed}/{state.missions.length}</span></div>{state.missions.map((mission, index) => <label className={mission.done ? "is-done" : ""} key={mission.id}><input type="checkbox" checked={mission.done} onChange={(e) => patch("missions", state.missions.map((item) => item.id === mission.id ? { ...item, done: e.target.checked } : item))}/><span>{String(index + 1).padStart(2, "0")}</span><input aria-label={`ミッション${index + 1}`} value={mission.label} maxLength={32} onChange={(e) => patch("missions", state.missions.map((item) => item.id === mission.id ? { ...item, label: e.target.value } : item))}/></label>)}</div>
+        <div className="guild-panel guild-editor">
+          {sharedPassport ? <><div className="guild-shared-passport"><span>✦</span><div><b>{state.hostName}さんから届いたパスポート</b><p>名前を入れて、思い出ミッションを自分のペースで進めよう。</p></div></div><div className="guild-form-grid"><label className="wide">あなたの名前<input value={state.listenerName} maxLength={24} placeholder="リスナー名" onChange={(e) => patch("listenerName", e.target.value)} /></label></div></> : <><h3>ライバー用パスポート設定</h3><div className="guild-form-grid"><label>ライバー名<input value={state.hostName} maxLength={24} onChange={(e) => patch("hostName", e.target.value)} /></label><label>プレビュー用リスナー名<input value={state.listenerName} maxLength={24} onChange={(e) => patch("listenerName", e.target.value)} /></label><label className="wide">枠・王国の名前<input value={state.passportTitle} maxLength={32} onChange={(e) => patch("passportTitle", e.target.value)} /></label></div></>}
+          <div className="guild-missions"><div className="guild-panel-title"><h3>{sharedPassport ? "この枠の思い出ミッション" : "思い出ミッションを編集"}</h3><span>{completed}/{state.missions.length}</span></div>{state.missions.map((mission, index) => <label className={mission.done ? "is-done" : ""} key={mission.id}><input type="checkbox" checked={mission.done} onChange={(e) => patch("missions", state.missions.map((item) => item.id === mission.id ? { ...item, done: e.target.checked } : item))}/><span>{String(index + 1).padStart(2, "0")}</span>{sharedPassport ? <b className="guild-mission-label">{mission.label}</b> : <input aria-label={`ミッション${index + 1}`} value={mission.label} maxLength={32} onChange={(e) => patch("missions", state.missions.map((item) => item.id === mission.id ? { ...item, label: e.target.value } : item))}/>}</label>)}</div>
+          {sharedPassport ? <Link className="guild-edit-return" href="/tools/oshi-passport">ライバー用の編集画面をひらく</Link> : <div className="guild-passport-share"><div><b>できたら、リスナーへ共有</b><p>ライバー名・枠名・ミッションだけをURLに入れます。リスナー名や進捗は共有されません。</p></div><button className="guild-primary" onClick={sharePassport}>リスナー用URLをコピー</button></div>}
         </div>
         <div className="guild-preview-stack"><div className="guild-preview-label"><span>NOW</span><b>現在のカード</b></div><PassportCard grade={grade} state={state}/><div className="guild-grade-progress"><span style={{ width: `${nextGrade ? ((completed - grade.threshold) / (nextGrade.threshold - grade.threshold)) * 100 : 100}%` }}/></div><p className="guild-next-message">{nextGrade ? <><b>あと{remaining}個</b>の思い出で <strong>{nextGrade.name}</strong> に進化</> : <><b>最高グレード達成。</b>これからの思い出も、このカードに刻まれます。</>}</p><button className="guild-primary" onClick={() => downloadCard("passport", state, grade)}>パスポートをPNG保存</button>
           {nextGrade && <div className="guild-next-card"><div className="guild-preview-label"><span>NEXT</span><b>次に手に入るカード</b></div><PassportCard grade={nextGrade} state={state} locked/><div className="guild-next-perks"><span>✦ 新しい箔カラー</span><span>✦ 専用称号</span><span>✦ コレクション更新</span></div></div>}
@@ -210,8 +231,8 @@ export function FanGuildSuite({ initialMode }: { initialMode: GuildMode }) {
 
     {initialMode === "relay" && <section className="guild-workspace">
       <div className="guild-section-heading"><div><span>03 / CONNECT</span><h2>IRIAM企画リレー</h2><p>次のライバーへ物語を渡し、みんなの企画を一本の軌跡に。</p></div><div className="guild-progress-badge"><b>{state.relayMembers.filter((m) => m.done).length}/{state.relayMembers.length}</b><span>BATON</span></div></div>
-      <div className="guild-two-column relay-layout"><div className="guild-panel guild-editor"><h3>リレーを編成</h3><div className="guild-form-grid"><label className="wide">企画名<input value={state.relayTitle} maxLength={40} onChange={(e) => patch("relayTitle", e.target.value)}/></label><label className="wide">共通ハッシュタグ<input value={state.relayTag} maxLength={40} onChange={(e) => patch("relayTag", e.target.value)}/></label></div><div className="guild-relay-editor">{state.relayMembers.map((member, index) => <div key={member.id}><button aria-label="完了状態を変更" className={member.done ? "done" : ""} onClick={() => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, done: !item.done } : item))}>{member.done ? "✓" : index + 1}</button><input aria-label={`走者${index + 1}`} value={member.name} maxLength={24} onChange={(e) => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, name: e.target.value } : item))}/><input aria-label={`日程${index + 1}`} value={member.date} maxLength={14} onChange={(e) => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, date: e.target.value } : item))}/><button className="remove" aria-label="走者を削除" onClick={() => patch("relayMembers", state.relayMembers.filter((item) => item.id !== member.id))}>×</button></div>)}</div><button className="guild-secondary" onClick={() => patch("relayMembers", [...state.relayMembers, { id: crypto.randomUUID(), name: "次のライバー", date: "未定", done: false }])}>＋ 次の走者を追加</button></div>
-        <div className="guild-panel guild-relay-preview"><div className="relay-ticket-head"><span>OFFICIAL RELAY PASS</span><b>{state.relayTag}</b></div><h3>{state.relayTitle}</h3><div className="relay-route">{state.relayMembers.map((member, index) => <div className={member.done ? "is-done" : ""} key={member.id}><i>{member.done ? "✓" : index + 1}</i><span><b>{member.name || "走者未定"}</b><small>{member.date || "日程未定"}</small></span>{index < state.relayMembers.length - 1 && <em>BATON</em>}</div>)}</div><div className="relay-footer"><b>{state.relayMembers.filter((m) => m.done).length} PASSED</b><span>つぎの声へ、物語をつなぐ。</span></div><button className="guild-primary" onClick={() => copy(`🎙 ${state.relayTitle}\n${state.relayMembers.map((member, index) => `${index + 1}. ${member.name}｜${member.date}`).join("\n")}\n${state.relayTag}`)}>リレー告知文をコピー</button></div></div>
+      <div className="guild-two-column relay-layout"><div className="guild-panel guild-editor"><h3>リレーを編成</h3><div className="guild-form-grid"><label className="wide">企画名<input value={state.relayTitle} maxLength={40} onChange={(e) => patch("relayTitle", e.target.value)}/></label><label className="wide">共通ハッシュタグ<input value={state.relayTag} maxLength={40} onChange={(e) => patch("relayTag", e.target.value)}/></label></div><div className="guild-relay-editor">{state.relayMembers.map((member, index) => <div key={member.id}><button aria-label="完了状態を変更" className={member.done ? "done" : ""} onClick={() => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, done: !item.done } : item))}>{member.done ? "✓" : index + 1}</button><div className="relay-slot-fields"><input aria-label={`走者${index + 1}`} value={member.name} maxLength={24} onChange={(e) => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, name: e.target.value } : item))}/><div><input aria-label={`日程${index + 1}`} value={member.date} maxLength={14} placeholder="7/29" onChange={(e) => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, date: e.target.value } : item))}/><input type="time" aria-label={`開始時刻${index + 1}`} value={member.time ?? ""} onChange={(e) => patch("relayMembers", state.relayMembers.map((item) => item.id === member.id ? { ...item, time: e.target.value } : item))}/></div></div><button className="remove" aria-label="走者を削除" onClick={() => patch("relayMembers", state.relayMembers.filter((item) => item.id !== member.id))}>×</button></div>)}</div><button className="guild-secondary" onClick={() => patch("relayMembers", [...state.relayMembers, { id: crypto.randomUUID(), name: "次のライバー", date: "未定", time: "21:00", done: false }])}>＋ 次の走者を追加</button></div>
+        <div className="guild-panel guild-relay-preview"><div className="relay-ticket-head"><span>OFFICIAL RELAY PASS</span><b>{state.relayTag}</b></div><h3>{state.relayTitle}</h3><div className="relay-route">{state.relayMembers.map((member, index) => <div className={member.done ? "is-done" : ""} key={member.id}><i>{member.done ? "✓" : index + 1}</i><span><b>{member.name || "走者未定"}</b><small>{member.date || "日程未定"}{member.time ? `　${member.time} START` : ""}</small></span>{index < state.relayMembers.length - 1 && <em>BATON</em>}</div>)}</div><div className="relay-footer"><b>{state.relayMembers.filter((m) => m.done).length} PASSED</b><span>つぎの声へ、物語をつなぐ。</span></div><button className="guild-primary" onClick={() => copy(`🎙 ${state.relayTitle}\n${state.relayMembers.map((member, index) => `${index + 1}. ${member.name}｜${member.date}${member.time ? ` ${member.time}〜` : ""}`).join("\n")}\n${state.relayTag}`)}>リレー告知文をコピー</button></div></div>
     </section>}
 
     {initialMode === "rewards" && <section className="guild-workspace">

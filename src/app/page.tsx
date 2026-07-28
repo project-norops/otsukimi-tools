@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MemoryList } from "@/components/memory-list";
 import { ToolList } from "@/components/tool-list";
 
 const characters = [
@@ -33,15 +34,15 @@ export default function Home() {
           <h1>
             配信活動を、
             <br />
-            <em>ちょっと便利に。</em>
+            <em>もっと楽しく。</em>
           </h1>
           <p>
             登録なし、スマホですぐ使える。
             <br />
-            配信する人と応援する人のための、やさしいツール置き場です。
+            配信する人と応援する人のための、思い出体験とやさしいツール置き場です。
           </p>
           <div className="hero-actions">
-            <a className="button" href="#tools">ツールを見てみる</a>
+            <a className="button" href="#memories">思い出を残してみる</a>
             <span>すべて無料でお試しいただけます</span>
           </div>
         </div>
@@ -64,12 +65,20 @@ export default function Home() {
         <div><b>シンプル</b><span>複雑な設定はできるだけ省略</span></div>
       </section>
 
+      <section id="memories" className="memory-home" aria-labelledby="memory-heading">
+        <div className="memory-home-heading">
+          <div><span>FOR MEMORIES</span><h2 id="memory-heading">枠で過ごした時間を、<br/><em>特別なものに。</em></h2></div>
+          <p>便利さだけではなく、続けたくなること、贈りたくなること。<br/>ライバーとリスナーの思い出を育てる4つの体験です。</p>
+        </div>
+        <MemoryList />
+      </section>
+
       <section id="tools" className="home-tools">
         <div className="section-heading">
           <div>
             <span className="eyebrow">available now</span>
-            <h2>おすすめツール</h2>
-            <p>気になるものから、すぐにどうぞ。</p>
+            <h2>活動を助けるツール</h2>
+            <p>配信準備や日々の作業を、少しだけ軽く。</p>
           </div>
         </div>
         <ToolList />

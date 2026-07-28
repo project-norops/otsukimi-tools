@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getNextPassportGrade, getPassportGrade, stampsUntilNextGrade, summarizeRewards } from "./fan-guild";
+import { decodePassportTemplate, encodePassportTemplate, getNextPassportGrade, getPassportGrade, stampsUntilNextGrade, summarizeRewards } from "./fan-guild";
 
 describe("fan guild passport", () => {
   it("changes grade at each threshold", () => {
@@ -14,6 +14,16 @@ describe("fan guild passport", () => {
     expect(stampsUntilNextGrade(4)).toBe(2);
     expect(getNextPassportGrade(12)).toBeNull();
     expect(stampsUntilNextGrade(12)).toBe(0);
+  });
+
+  it("shares a Japanese mission template without listener progress", () => {
+    const encoded = encodePassportTemplate({ hostName: "月見みれい", passportTitle: "月夜の王国", missions: ["挨拶する", "合言葉を見つける"] });
+    expect(decodePassportTemplate(encoded)).toEqual({ hostName: "月見みれい", passportTitle: "月夜の王国", missions: ["挨拶する", "合言葉を見つける"] });
+    expect(encoded).not.toContain("月見みれい");
+  });
+
+  it("rejects a broken passport share value", () => {
+    expect(decodePassportTemplate("not-a-passport")).toBeNull();
   });
 });
 
