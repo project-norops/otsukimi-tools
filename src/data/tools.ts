@@ -8,10 +8,10 @@ export const tools: ToolMetadata[] = [
   { id: "rank-calendar", name: "IRIAMランク管理カレンダー", description: "日別スコアとスキパから、1〜6か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
   { id: "liver-planner", name: "ライバー手帳", description: "配信予定・タスク・プライベート予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner" },
   { id: "clipper", name: "10秒動画メイカー", description: "「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール。", audiences: ["liver"], status: "available", href: "/tools/clipper" },
-  { id: "daily-mirei", name: "本日の美玲ちゃん", description: "今日の美玲ちゃんを楽しく観測。可愛さはいつでも120%。", audiences: ["liver", "listener"], status: "available", href: "/tools/daily-mirei" },
+  { id: "daily-mirei", name: "本日の美玲ちゃん", description: "今日の美玲ちゃんを楽しく観測。可愛さはいつでも120%。", audiences: ["liver", "listener"], status: "available", href: "/tools/daily-mirei", listed: false },
   { id: "tsukimikko-fortune", name: "つきみっこ専用くじ", description: "今日のコンディションに、美玲ちゃんバフをひとつ。", audiences: ["listener"], status: "available", href: "/tools/tsukimikko-fortune" },
-  { id: "mirei-alert", name: "美玲ちゃん注意報", description: "何をしていても結局刺さる。今日の注意報を観測します。", audiences: ["liver", "listener"], status: "available", href: "/tools/mirei-alert" },
-  { id: "liver-match", name: "おすすめライバー診断", description: "宇宙規模のデータから、あなたに合うライバーを診断します。", audiences: ["listener"], status: "available", href: "/tools/liver-match" },
+  { id: "mirei-alert", name: "美玲ちゃん注意報", description: "何をしていても結局刺さる。今日の注意報を観測します。", audiences: ["liver", "listener"], status: "available", href: "/tools/mirei-alert", listed: false },
+  { id: "liver-match", name: "おすすめライバー診断", description: "宇宙規模のデータから、あなたに合うライバーを診断します。", audiences: ["listener"], status: "available", href: "/tools/liver-match", listed: false },
   { id: "event-pace", name: "イベント着地予測", description: "現在ポイントと残り時間から着地や必要ペースを試算します。", audiences: ["liver", "listener"], status: "in_development" },
   { id: "oshi-budget", name: "推し活予算ペースメーカー", description: "月末までの安全な利用ペースを見える化します。", audiences: ["listener"], status: "in_development" },
   { id: "anniversary-calendar", name: "記念日カレンダー", description: "基準日から周年や100日単位の記念日を一覧にします。", audiences: ["liver", "listener"], status: "in_development" },
@@ -44,9 +44,6 @@ const homeToolIds = [
   "clipper",
   "gacha-planner",
   "icon-ring",
-  "daily-mirei",
-  "liver-match",
-  "mirei-alert",
 ] as const;
 
 /** ツール欄には、実務を助けるツールだけを指定順で掲載する。 */
