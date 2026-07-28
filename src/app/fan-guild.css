@@ -1,0 +1,129 @@
+.guild-shell {
+  --guild-ink: #241d31;
+  --guild-muted: #70677b;
+  --guild-paper: #fffdf8;
+  --guild-line: #e5dce9;
+  --guild-violet: #6d46b7;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  color: var(--guild-ink);
+}
+.guild-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 48px;
+  padding: 70px 6% 62px;
+  overflow: hidden;
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at 84% 18%, rgba(255,255,255,.26) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 66%, rgba(255,255,255,.18) 0 1px, transparent 2px),
+    linear-gradient(135deg, #241732 0%, #513260 52%, #9e5e74 100%);
+  background-size: 64px 64px, 38px 38px, auto;
+  box-shadow: 0 30px 70px rgba(45, 25, 53, .2);
+  color: white;
+}
+.guild-hero::before,.guild-hero::after { position:absolute; border:1px solid rgba(255,255,255,.18); border-radius:50%; content:""; pointer-events:none; }
+.guild-hero::before { width:340px; height:340px; right:-80px; top:-180px; }
+.guild-hero::after { width:220px; height:220px; right:40px; top:-100px; }
+.guild-kicker { margin:0 0 14px; color:#f0c9d9; font-size:12px; font-weight:900; letter-spacing:.22em; }
+.guild-hero h1 { max-width:760px; margin:0; font-family:Georgia,"Yu Mincho",serif; font-size:clamp(36px,5vw,62px); font-weight:700; line-height:1.25; letter-spacing:-.035em; }
+.guild-hero h1 em { color:#ffdfad; font-style:normal; white-space:nowrap; }
+.guild-hero p:last-child { max-width:680px; margin:22px 0 0; color:rgba(255,255,255,.78); font-size:16px; line-height:1.85; }
+.guild-hero-seal { position:relative; z-index:1; display:grid; place-items:center; width:168px; height:168px; border:1px solid rgba(255,255,255,.5); border-radius:50%; outline:1px solid rgba(255,255,255,.2); outline-offset:8px; text-align:center; }
+.guild-hero-seal::before { position:absolute; inset:14px; border:1px dashed rgba(255,255,255,.35); border-radius:50%; content:""; }
+.guild-hero-seal span { font-size:28px; line-height:1; }
+.guild-hero-seal b { font-family:Georgia,serif; font-size:12px; line-height:1.65; letter-spacing:.18em; }
+.guild-mode-nav { position:relative; z-index:2; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:-24px 28px 0; padding:10px; border:1px solid rgba(66,38,78,.12); border-radius:24px; background:rgba(255,253,248,.94); box-shadow:0 18px 40px rgba(48,30,55,.12); backdrop-filter:blur(16px); }
+.guild-mode-nav a { display:grid; grid-template-columns:38px 1fr; grid-template-rows:auto auto; align-items:center; min-width:0; padding:13px 15px; border-radius:17px; color:var(--guild-muted); transition:.2s ease; }
+.guild-mode-nav a:hover { background:#f5eef7; transform:translateY(-1px); }
+.guild-mode-nav a.is-active { background:var(--guild-ink); color:white; box-shadow:0 10px 22px rgba(36,29,49,.24); }
+.guild-mode-nav a>span { grid-row:1/3; display:grid; place-items:center; width:30px; height:30px; border:1px solid currentColor; border-radius:50%; font-family:Georgia,serif; font-size:13px; font-weight:900; }
+.guild-mode-nav small { font-size:10px; font-weight:800; letter-spacing:.12em; opacity:.68; }
+.guild-mode-nav b { overflow:hidden; font-size:13px; white-space:nowrap; text-overflow:ellipsis; }
+.guild-privacy { margin:23px 0 0; color:var(--guild-muted); font-size:12px; text-align:center; }
+.guild-workspace { padding:64px 0 10px; }
+.guild-section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:24px; }
+.guild-section-heading>div:first-child>span { color:var(--guild-violet); font-family:Georgia,serif; font-size:12px; font-weight:900; letter-spacing:.2em; }
+.guild-section-heading h2 { margin:7px 0 6px; font-family:Georgia,"Yu Mincho",serif; font-size:clamp(30px,4vw,48px); line-height:1.2; }
+.guild-section-heading p { margin:0; color:var(--guild-muted); }
+.guild-progress-badge { display:grid; justify-items:end; flex:0 0 auto; }
+.guild-progress-badge b { font-family:Georgia,serif; font-size:38px; line-height:1; }
+.guild-progress-badge span { margin-top:4px; color:var(--guild-violet); font-size:9px; font-weight:900; letter-spacing:.2em; }
+.guild-two-column { display:grid; grid-template-columns:minmax(360px,.92fr) minmax(420px,1.08fr); align-items:start; gap:26px; }
+.guild-panel { border:1px solid var(--guild-line); border-radius:28px; background:rgba(255,255,255,.88); box-shadow:0 16px 40px rgba(44,31,53,.07); }
+.guild-editor { padding:28px; }
+.guild-editor>h3,.guild-panel-title h3 { margin:0 0 20px; font-size:17px; }
+.guild-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.guild-form-grid label,.guild-kanban label { display:grid; gap:7px; color:var(--guild-muted); font-size:11px; font-weight:800; }
+.guild-form-grid .wide { grid-column:1/-1; }
+.guild-shell input,.guild-shell textarea,.guild-shell select { width:100%; border:1px solid var(--guild-line); border-radius:12px; background:#fffdfa; color:var(--guild-ink); outline:none; }
+.guild-shell input,.guild-shell select { min-height:43px; padding:9px 12px; }
+.guild-shell textarea { padding:12px; resize:vertical; line-height:1.65; }
+.guild-shell input:focus,.guild-shell textarea:focus,.guild-shell select:focus { border-color:#8c6dc1; box-shadow:0 0 0 3px rgba(109,70,183,.1); }
+.guild-missions { margin-top:30px; padding-top:23px; border-top:1px solid var(--guild-line); }
+.guild-panel-title { display:flex; justify-content:space-between; }
+.guild-panel-title h3 { margin-bottom:14px; }
+.guild-panel-title span { color:var(--guild-violet); font-size:12px; font-weight:900; }
+.guild-missions>label { display:grid; grid-template-columns:24px 25px minmax(0,1fr); align-items:center; gap:8px; padding:5px 4px; border-radius:12px; transition:.2s; }
+.guild-missions>label:hover { background:#faf5fb; }
+.guild-missions>label>input[type=checkbox] { width:19px; height:19px; min-height:0; accent-color:var(--guild-violet); }
+.guild-missions>label>span { color:#a89fac; font-family:Georgia,serif; font-size:10px; }
+.guild-missions>label>input:last-child { min-height:36px; border-color:transparent; background:transparent; }
+.guild-missions>label.is-done>input:last-child { color:#82758b; text-decoration:line-through; }
+.guild-preview-stack { display:grid; gap:13px; }
+.guild-preview-label { display:flex; align-items:center; gap:10px; color:var(--guild-muted); font-size:12px; }
+.guild-preview-label span { padding:4px 8px; border-radius:20px; background:#ede5f2; color:var(--guild-violet); font-size:9px; font-weight:900; letter-spacing:.12em; }
+.guild-passport-card { --grade-deep:#39253e; --grade-main:#ad7190; --grade-light:#ffe3cb; position:relative; min-height:320px; padding:28px 30px 24px; overflow:hidden; border:1px solid rgba(255,255,255,.56); border-radius:26px; background:linear-gradient(135deg,var(--grade-deep),var(--grade-main) 58%,var(--grade-light)); box-shadow:0 25px 55px color-mix(in srgb,var(--grade-main) 30%,transparent), inset 0 0 0 1px rgba(255,255,255,.26); color:white; isolation:isolate; }
+.guild-passport-card::before { position:absolute; inset:14px; z-index:-1; border:1px solid rgba(255,255,255,.42); border-radius:18px; content:""; }
+.guild-passport-card::after { position:absolute; right:-70px; top:-90px; z-index:-2; width:300px; height:300px; border:48px solid rgba(255,255,255,.08); border-radius:50%; content:""; }
+.guild-card-glow { position:absolute; z-index:-1; inset:-50%; background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.28) 47%,transparent 56%); transform:translateX(-35%) rotate(6deg); animation:guild-shimmer 6s ease-in-out infinite; }
+@keyframes guild-shimmer { 50% { transform:translateX(35%) rotate(6deg); } }
+.guild-card-top,.guild-card-bottom { display:flex; align-items:center; justify-content:space-between; gap:20px; font-size:10px; letter-spacing:.18em; }
+.guild-card-top span { padding:5px 9px; border:1px solid rgba(255,255,255,.55); border-radius:20px; font-family:Georgia,serif; font-weight:900; }
+.guild-card-copy { position:absolute; left:31px; right:31px; bottom:64px; display:grid; }
+.guild-card-copy small { color:rgba(255,255,255,.72); font-size:11px; letter-spacing:.08em; }
+.guild-card-copy strong { margin:5px 0 12px; font-family:Georgia,"Yu Mincho",serif; font-size:clamp(24px,3.2vw,39px); line-height:1.25; text-shadow:0 2px 16px rgba(0,0,0,.18); }
+.guild-card-copy span { font-size:12px; font-weight:800; letter-spacing:.08em; }
+.guild-card-bottom { position:absolute; right:30px; bottom:25px; left:30px; color:rgba(255,255,255,.76); }
+.guild-card-bottom b { color:white; font-family:Georgia,serif; }
+.guild-card-orbit { position:absolute; right:34px; top:62px; width:118px; height:118px; border:1px solid rgba(255,255,255,.28); border-radius:50%; }
+.guild-card-orbit::before,.guild-card-orbit::after { position:absolute; border:1px solid rgba(255,255,255,.2); border-radius:50%; content:""; }
+.guild-card-orbit::before { inset:18px; }.guild-card-orbit::after { inset:39px; background:rgba(255,255,255,.15); }
+.guild-card-orbit i { position:absolute; width:6px; height:6px; border-radius:50%; background:white; box-shadow:0 0 15px white; }.guild-card-orbit i:nth-child(1){top:-3px;left:55px}.guild-card-orbit i:nth-child(2){right:5px;bottom:18px}.guild-card-orbit i:nth-child(3){left:2px;bottom:25px}
+.guild-passport-card.is-locked { min-height:235px; filter:saturate(.85); }
+.guild-passport-card.is-locked .guild-card-copy,.guild-passport-card.is-locked .guild-card-orbit { filter:blur(5px); opacity:.4; }
+.guild-card-lock { position:absolute; inset:0; display:grid; place-content:center; justify-items:center; gap:7px; background:rgba(25,18,33,.16); text-shadow:0 2px 12px rgba(0,0,0,.45); }
+.guild-card-lock span { font-size:34px; }.guild-card-lock b { font-size:13px; letter-spacing:.12em; }
+.guild-grade-progress { height:7px; overflow:hidden; border-radius:20px; background:#e7dfe9; }.guild-grade-progress span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#7150ae,#df799c); transition:width .35s ease; }
+.guild-next-message { margin:0; color:var(--guild-muted); font-size:13px; text-align:center; }.guild-next-message b,.guild-next-message strong { color:var(--guild-violet); }
+.guild-primary,.guild-secondary { min-height:46px; padding:11px 18px; border-radius:14px; font-size:13px; font-weight:900; }
+.guild-primary { border:0; background:var(--guild-ink); box-shadow:0 12px 24px rgba(36,29,49,.2); color:white; }.guild-primary:hover { background:#4d365e; transform:translateY(-1px); }
+.guild-secondary { border:1px solid var(--guild-line); background:white; color:var(--guild-ink); }.guild-secondary:hover { border-color:#a187b4; background:#fbf6fc; }
+.guild-next-card { display:grid; gap:11px; margin-top:25px; padding-top:24px; border-top:1px solid var(--guild-line); }
+.guild-next-perks { display:flex; flex-wrap:wrap; gap:7px; }.guild-next-perks span { padding:6px 9px; border-radius:20px; background:#f1ebf4; color:#75647f; font-size:10px; font-weight:800; }
+.guild-grade-collection { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:18px; border:1px solid var(--guild-line); border-radius:17px; }.guild-grade-collection>b { width:100%; font-family:Georgia,serif; font-size:11px; letter-spacing:.17em; }.guild-grade-collection span { padding:7px 10px; border-radius:20px; background:linear-gradient(135deg,var(--grade-deep),var(--grade-main)); color:white; font-size:9px; font-weight:900; }
+.guild-theme-picker { display:flex; gap:12px; margin:24px 0 0; padding:20px 0 0; border:0; border-top:1px solid var(--guild-line); }.guild-theme-picker legend { float:left; width:100%; margin-bottom:12px; color:var(--guild-muted); font-size:11px; font-weight:800; }.guild-theme-picker label { display:grid; grid-template-columns:28px auto; align-items:center; gap:8px; cursor:pointer; }.guild-theme-picker input { position:absolute; opacity:0; }.guild-theme-picker span { width:28px; height:28px; border:3px solid white; border-radius:50%; box-shadow:0 0 0 1px #d6cbd9; }.guild-theme-picker input:checked+span { box-shadow:0 0 0 3px var(--guild-violet); }.guild-theme-picker .theme-night span { background:linear-gradient(135deg,#171536,#9183e9); }.guild-theme-picker .theme-rose span { background:linear-gradient(135deg,#541f36,#ef9bb5); }.guild-theme-picker .theme-mint span { background:linear-gradient(135deg,#103d3b,#6ee7cf); }.guild-theme-picker b { font-size:12px; }
+.guild-suggestions { display:flex; flex-wrap:wrap; gap:7px; margin-top:24px; }.guild-suggestions small { width:100%; color:var(--guild-muted); font-weight:800; }.guild-suggestions button { padding:7px 9px; border:1px solid var(--guild-line); border-radius:20px; background:white; color:#6b5e70; font-size:10px; }
+.guild-award-card { position:relative; display:grid; justify-items:center; min-height:430px; padding:42px 50px 32px; overflow:hidden; border-radius:26px; box-shadow:0 25px 55px rgba(36,29,49,.22); color:white; text-align:center; isolation:isolate; }.guild-award-card.theme-night { background:radial-gradient(circle at 50% 20%,#6557c8 0,transparent 30%),linear-gradient(145deg,#111027,#282252 70%,#54479b); }.guild-award-card.theme-rose { background:radial-gradient(circle at 50% 20%,#d66b91 0,transparent 32%),linear-gradient(145deg,#401526,#7d2f4c 70%,#be6a83); }.guild-award-card.theme-mint { background:radial-gradient(circle at 50% 20%,#4ab7a6 0,transparent 32%),linear-gradient(145deg,#0b302e,#195f5a 70%,#3b9a8e); }
+.guild-award-card::before { position:absolute; inset:15px; z-index:-1; border:1px solid rgba(255,255,255,.42); border-radius:19px; content:""; }.guild-award-card::after { position:absolute; z-index:-2; width:380px; height:380px; top:-245px; border:72px solid rgba(255,255,255,.07); border-radius:50%; content:""; }
+.guild-award-stars { color:#ffe8b5; font-size:16px; letter-spacing:.3em; }.guild-award-card>small { margin-top:14px; font-family:Georgia,serif; letter-spacing:.2em; }.guild-award-laurel { margin:24px 0 8px; color:#ffe8b5; font-size:44px; transform:rotate(-12deg); }.guild-award-card h3 { margin:0; font-family:Georgia,"Yu Mincho",serif; font-size:clamp(27px,3vw,40px); }.guild-award-card> b { margin-top:12px; font-size:21px; }.guild-award-card p { max-width:560px; margin:21px 0; color:rgba(255,255,255,.8); font-size:13px; line-height:1.8; }.guild-award-card footer { position:absolute; right:40px; bottom:25px; left:40px; padding:0; border:0; color:rgba(255,255,255,.68); font-family:Georgia,serif; font-size:10px; letter-spacing:.18em; }
+.guild-relay-editor { display:grid; gap:8px; margin:25px 0 16px; }.guild-relay-editor>div { display:grid; grid-template-columns:35px minmax(0,1fr) 78px 29px; gap:7px; align-items:center; }.guild-relay-editor button { width:34px; height:34px; padding:0; border:1px solid var(--guild-line); border-radius:50%; background:white; color:#8c7c94; font-weight:900; }.guild-relay-editor button.done { border-color:#51a28d; background:#287461; color:white; }.guild-relay-editor button.remove { width:28px; height:28px; border:0; background:#f4edf1; color:#9d6b7b; }
+.guild-relay-preview { padding:0; overflow:hidden; background:linear-gradient(145deg,#21162c,#553564 70%,#90556c); color:white; }.relay-ticket-head { display:flex; justify-content:space-between; gap:16px; padding:20px 25px; border-bottom:1px dashed rgba(255,255,255,.32); font-family:Georgia,serif; font-size:10px; letter-spacing:.13em; }.relay-ticket-head b { color:#ffd7ab; }.guild-relay-preview>h3 { margin:28px 28px 23px; font-family:Georgia,"Yu Mincho",serif; font-size:34px; }.relay-route { padding:0 28px; }.relay-route>div { position:relative; display:grid; grid-template-columns:42px 1fr; align-items:center; gap:12px; min-height:80px; }.relay-route i { position:relative; z-index:1; display:grid; place-items:center; width:38px; height:38px; border:1px solid rgba(255,255,255,.6); border-radius:50%; background:#41284d; color:white; font-style:normal; font-weight:900; }.relay-route>div.is-done i { border-color:#9be9d4; background:#3a947e; box-shadow:0 0 22px rgba(126,238,207,.35); }.relay-route>div:not(:last-child)::after { position:absolute; left:18px; top:57px; width:1px; height:47px; background:linear-gradient(rgba(255,255,255,.5),transparent); content:""; }.relay-route span { display:grid; }.relay-route span b { font-size:15px; }.relay-route span small { margin-top:3px; color:rgba(255,255,255,.6); }.relay-route em { position:absolute; right:0; bottom:3px; color:rgba(255,255,255,.26); font-family:Georgia,serif; font-size:9px; font-style:normal; letter-spacing:.2em; }.relay-footer { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-top:16px; padding:19px 28px; border-top:1px dashed rgba(255,255,255,.28); font-size:11px; }.relay-footer b { color:#ffd7ab; letter-spacing:.14em; }.guild-relay-preview>.guild-primary { width:calc(100% - 56px); margin:4px 28px 28px; background:white; color:#3c2647; }
+.guild-reward-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:18px; }.guild-reward-summary>div { display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border:1px solid var(--guild-line); border-radius:16px; background:white; }.guild-reward-summary span { color:var(--guild-muted); font-size:11px; font-weight:800; }.guild-reward-summary b { font-family:Georgia,serif; font-size:25px; }.guild-reward-summary .status-making b { color:#bd7724; }.guild-reward-summary .status-checking b { color:#7463c3; }.guild-reward-summary .status-sent b { color:#27806a; }
+.guild-kanban { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; align-items:start; }.guild-kanban-column { min-width:0; padding:13px; border:1px solid var(--guild-line); border-radius:21px; background:#f7f2f5; }.guild-kanban-column>header { display:flex; align-items:center; gap:8px; padding:4px 3px 13px; }.guild-kanban-column>header span { width:9px; height:9px; border-radius:50%; background:#9a8d9e; }.guild-kanban-column.status-making>header span { background:#d59a48; }.guild-kanban-column.status-checking>header span { background:#8878d1; }.guild-kanban-column.status-sent>header span { background:#42a58e; }.guild-kanban-column>header h3 { flex:1; margin:0; font-size:12px; }.guild-kanban-column>header b { display:grid; place-items:center; width:23px; height:23px; border-radius:50%; background:white; font-size:10px; }.guild-kanban-column>div { display:grid; gap:10px; }.guild-kanban-column article { display:grid; gap:10px; padding:14px; border:1px solid var(--guild-line); border-radius:15px; background:white; box-shadow:0 6px 18px rgba(49,33,56,.06); }.guild-kanban-column article label { gap:3px; font-size:9px; }.guild-kanban-column article input,.guild-kanban-column article select { min-height:34px; padding:6px 7px; border-radius:8px; font-size:11px; }.guild-kanban-column article>div { display:grid; grid-template-columns:1fr 25px; align-items:end; gap:5px; }.guild-kanban-column article>div button { width:25px; height:25px; margin-bottom:5px; padding:0; border:0; border-radius:50%; background:#f4ecef; color:#a36a7b; }.guild-add-reward { width:100%; margin-top:10px; padding:10px; border:1px dashed #b8a9bc; border-radius:12px; background:transparent; color:#75647b; font-size:11px; font-weight:900; }
+.guild-delivery-note { display:grid; grid-template-columns:42px 1fr auto; align-items:center; gap:14px; margin-top:17px; padding:18px 20px; border:1px solid #cce3dd; border-radius:19px; background:#eff9f6; }.guild-delivery-note>span { display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:#2e806d; color:white; }.guild-delivery-note b { font-size:13px; }.guild-delivery-note p { margin:3px 0 0; color:#648078; font-size:11px; }.guild-delivery-note button { padding:9px 12px; border:0; border-radius:11px; background:#2e806d; color:white; font-size:11px; font-weight:900; }
+.guild-toast { position:fixed; right:24px; bottom:24px; z-index:50; padding:13px 18px; border-radius:14px; background:#221b2d; box-shadow:0 15px 35px rgba(0,0,0,.25); color:white; font-size:12px; font-weight:900; animation:guild-toast-in .25s ease-out; }@keyframes guild-toast-in{from{opacity:0;transform:translateY(8px)}}
+@media (max-width:900px) {
+  .guild-two-column { grid-template-columns:1fr; }.guild-kanban { grid-template-columns:repeat(2,minmax(0,1fr)); }.guild-mode-nav { margin-left:12px; margin-right:12px; }.guild-mode-nav a { grid-template-columns:30px 1fr; padding:10px; }.guild-mode-nav a>span { width:25px; height:25px; }.guild-mode-nav b { font-size:11px; }
+}
+@media (max-width:640px) {
+  .guild-shell { margin-top:-20px; }.guild-hero { grid-template-columns:1fr; gap:24px; padding:42px 24px 64px; border-radius:24px; }.guild-hero h1 { font-size:36px; }.guild-hero-seal { display:none; }.guild-mode-nav { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:-35px; border-radius:20px; }.guild-workspace { padding-top:44px; }.guild-section-heading { align-items:flex-start; }.guild-progress-badge b { font-size:28px; }.guild-section-heading p { font-size:13px; }.guild-form-grid { grid-template-columns:1fr; }.guild-form-grid .wide { grid-column:auto; }.guild-editor { padding:20px; }.guild-passport-card { min-height:270px; padding:23px; border-radius:21px; }.guild-passport-card::before { inset:11px; }.guild-card-copy { right:24px; bottom:58px; left:24px; }.guild-card-copy strong { font-size:25px; }.guild-card-bottom { right:24px; bottom:22px; left:24px; font-size:8px; }.guild-card-orbit { right:23px; top:55px; transform:scale(.75); transform-origin:top right; }.guild-award-card { min-height:410px; padding:36px 30px; }.guild-theme-picker { flex-wrap:wrap; }.guild-relay-preview>h3 { font-size:28px; }.guild-reward-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }.guild-kanban { grid-template-columns:1fr; }.guild-delivery-note { grid-template-columns:38px 1fr; }.guild-delivery-note button { grid-column:1/-1; }.guild-next-perks { display:none; }
+  .guild-section-heading { position:relative; display:block; min-height:92px; padding-right:0; }
+  .guild-section-heading h2 { padding-right:66px; font-size:25px; white-space:nowrap; }
+  .guild-progress-badge { position:absolute; top:4px; right:0; }
+}
+@media (prefers-reduced-motion:reduce) { .guild-card-glow { animation:none; } }

@@ -1,6 +1,10 @@
 export type Audience = "liver" | "listener";
 export interface ToolMetadata { id: string; name: string; description: string; audiences: Audience[]; status: "available" | "in_development"; href?: string; listed?: boolean }
 export const tools: ToolMetadata[] = [
+  { id: "oshi-passport", name: "推し枠パスポート", description: "枠で集めた思い出に合わせて、特別なメンバーカードが4段階に進化します。", audiences: ["liver", "listener"], status: "available", href: "/tools/oshi-passport" },
+  { id: "fan-awards", name: "月末ファン表彰式", description: "順位では表せない『ありがとう』を、リスナーだけの豪華な表彰カードにします。", audiences: ["liver"], status: "available", href: "/tools/fan-awards" },
+  { id: "project-relay", name: "IRIAM企画リレー", description: "走者と日程を一本の軌跡にして、次のライバーへ企画のバトンをつなぎます。", audiences: ["liver"], status: "available", href: "/tools/project-relay" },
+  { id: "reward-board", name: "返礼・特典かんばん", description: "返礼の未着手・制作中・確認待ち・お渡し済みを、端末内で見える化します。", audiences: ["liver"], status: "available", href: "/tools/reward-board" },
   { id: "rank-calendar", name: "IRIAMランク管理カレンダー", description: "日別スコアとスキパから、1〜6か月先までのランク推移を計画します。", audiences: ["liver"], status: "available", href: "/tools/rank-calendar" },
   { id: "liver-planner", name: "ライバー手帳", description: "配信予定・タスク・プライベート予定を、毎日ひらく手帳にまとめます。", audiences: ["liver"], status: "available", href: "/tools/liver-planner" },
   { id: "clipper", name: "10秒動画メイカー", description: "「ドドン！」で始めて「チーン！」で終わる、3ステップ動画作成ツール。", audiences: ["liver"], status: "available", href: "/tools/clipper" },
@@ -22,6 +26,10 @@ export const tools: ToolMetadata[] = [
 export const availableTools = tools.filter((tool) => tool.status === "available" && tool.href && tool.listed !== false);
 
 const homeToolIds = [
+  "oshi-passport",
+  "fan-awards",
+  "project-relay",
+  "reward-board",
   "rank-calendar",
   "liver-planner",
   "clipper",
