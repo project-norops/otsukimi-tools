@@ -65,14 +65,6 @@ export default function Home() {
         <div><b>シンプル</b><span>複雑な設定はできるだけ省略</span></div>
       </section>
 
-      <section id="memories" className="memory-home" aria-labelledby="memory-heading">
-        <div className="memory-home-heading">
-          <div><span>FOR MEMORIES</span><h2 id="memory-heading">枠で過ごした時間を、<br/><em>特別なものに。</em></h2></div>
-          <p>便利さだけではなく、続けたくなること、贈りたくなること。<br/>ライバーとリスナーの思い出を育てる4つの体験です。</p>
-        </div>
-        <MemoryList />
-      </section>
-
       <section id="tools" className="home-tools">
         <div className="section-heading">
           <div>
@@ -82,6 +74,14 @@ export default function Home() {
           </div>
         </div>
         <ToolList />
+      </section>
+
+      <section id="memories" className="memory-home" aria-labelledby="memory-heading">
+        <div className="memory-home-heading">
+          <div><span>FOR MEMORIES</span><h2 id="memory-heading">枠で過ごした時間を、<br/><em>特別なものに。</em></h2></div>
+          <p>便利さだけではなく、続けたくなること、贈りたくなること。<br/>ライバーとリスナーの思い出を育てる4つの体験です。</p>
+        </div>
+        <MemoryList />
       </section>
 
       <section className="character-section" aria-labelledby="character-heading">
