@@ -909,17 +909,20 @@ textarea {
   text-overflow: ellipsis;
 }
 .value-6 {
-  background: var(--pink) !important;
+  background: #c72f5b !important;
   color: #fff;
 }
 .value-4 {
-  background: #ff9bb5 !important;
+  background: #ffb3d0 !important;
+  color: #7d2345;
 }
 .value-2 {
-  background: var(--soft-pink) !important;
+  background: #cfe4ff !important;
+  color: #234f7d;
 }
 .value-1 {
-  background: #ffe7ca !important;
+  background: #ffe6a7 !important;
+  color: #6b4700;
 }
 .value-skip {
   background: var(--light-green) !important;

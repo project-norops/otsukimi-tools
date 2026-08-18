@@ -17,6 +17,11 @@ const position = (date: string) => {
   return { month: date.slice(0, 7), row: cell.row, column: cell.column };
 };
 
+const isRankBandContinuous = (previous: SimulationDay, current: SimulationDay) =>
+  addDays(previous.date, 1) === current.date &&
+  previous.rankBefore === current.rankBefore &&
+  !(previous.periodEnds && previous.rankEvent?.type === "keep");
+
 export function createRankBandSegments(days: SimulationDay[]): RankBandSegment[] {
   const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
   const segments: RankBandSegment[] = [];
@@ -33,8 +38,8 @@ export function createRankBandSegments(days: SimulationDay[]): RankBandSegment[]
       startColumn: firstPosition.column,
       span: end - start + 1,
       rank: first.rankBefore,
-      continuesBefore: Boolean(previous && addDays(previous.date, 1) === first.date && previous.rankBefore === first.rankBefore),
-      continuesAfter: Boolean(next && addDays(sorted[end].date, 1) === next.date && next.rankBefore === first.rankBefore),
+      continuesBefore: Boolean(previous && isRankBandContinuous(previous, first)),
+      continuesAfter: Boolean(next && isRankBandContinuous(sorted[end], next)),
     });
   };
   for (let index = 1; index <= sorted.length; index++) {
@@ -43,7 +48,7 @@ export function createRankBandSegments(days: SimulationDay[]): RankBandSegment[]
     if (!current) { flush(index - 1); break; }
     const before = position(previous.date);
     const now = position(current.date);
-    const continuous = addDays(previous.date, 1) === current.date && previous.rankBefore === current.rankBefore && before.month === now.month && before.row === now.row;
+    const continuous = isRankBandContinuous(previous, current) && before.month === now.month && before.row === now.row;
     if (!continuous) { flush(index - 1); start = index; }
   }
   return segments;
