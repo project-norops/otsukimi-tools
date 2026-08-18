@@ -10,4 +10,31 @@ describe("rank band segments", () => {
   it("splits at a rank change", () => { const days = simulate({ ...input, baseDate: "2026-07-14", score: 12 }, plan([["2026-07-14", 6]]), 3).days; const bands = createRankBandSegments(days); expect(bands.map((band) => band.rank)).toEqual(["S1", "S2"]); expect(bands[0].continuesAfter).toBe(false); });
   it("splits at the end of a week and marks continuation", () => { const bands = createRankBandSegments(simulate({ ...input, baseDate: "2026-07-18", score: 0 }, {}, 3).days); expect(bands).toHaveLength(2); expect(bands[0]).toMatchObject({ startColumn: 7, span: 1, continuesAfter: true }); expect(bands[1]).toMatchObject({ startColumn: 1, span: 2, continuesBefore: true }); });
   it("splits at a month boundary and marks continuation", () => { const bands = createRankBandSegments(simulate(input, {}, 4).days); expect(bands[0].month).toBe("2026-07"); expect(bands[1].month).toBe("2026-08"); expect(new Set(bands.map((band) => band.month))).toEqual(new Set(["2026-07", "2026-08"])); expect(bands[0].continuesAfter).toBe(true); expect(bands[1].continuesBefore).toBe(true); });
+  it("splits after the actual keep decision day", () => {
+    const days = simulate({ ...input, baseDate: "2026-07-14", score: 0 }, plan([
+      ["2026-07-14", 2], ["2026-07-15", 2], ["2026-07-16", 2], ["2026-07-17", 2],
+      ["2026-07-18", 2], ["2026-07-19", 1], ["2026-07-20", 1],
+    ]), 10).days;
+    const bands = createRankBandSegments(days);
+    expect(days[6]).toMatchObject({ date: "2026-07-20", periodEnds: true, rankEvent: { type: "keep" } });
+    expect(bands[1]).toMatchObject({ startColumn: 1, span: 2, continuesAfter: false });
+    expect(bands[2]).toMatchObject({ startColumn: 3, continuesBefore: false, rank: "S1" });
+  });
+  it("splits after a skip-extended keep decision day", () => {
+    const days = simulate({ ...input, baseDate: "2026-07-14", score: 0, skipPasses: 1 }, plan([
+      ["2026-07-14", "skip"], ["2026-07-15", 2], ["2026-07-16", 2], ["2026-07-17", 2],
+      ["2026-07-18", 2], ["2026-07-19", 2], ["2026-07-20", 1], ["2026-07-21", 1],
+    ]), 11).days;
+    const bands = createRankBandSegments(days);
+    expect(days[7]).toMatchObject({ date: "2026-07-21", periodEnds: true, rankEvent: { type: "keep" } });
+    expect(bands[1]).toMatchObject({ startColumn: 1, span: 3, continuesAfter: false });
+    expect(bands[2]).toMatchObject({ startColumn: 4, continuesBefore: false, rank: "S1" });
+  });
+  it("keeps the existing continuity for a non-keep decision with the same rank", () => {
+    const days = simulate({ ...input, baseDate: "2026-07-14", rank: "S3", score: 17 }, plan([["2026-07-14", 1]]), 3).days;
+    const before = structuredClone(days);
+    expect(createRankBandSegments(days)).toHaveLength(1);
+    expect(days[0]).toMatchObject({ periodEnds: true, rankEvent: { type: "up" }, rankAfter: "S3" });
+    expect(days).toEqual(before);
+  });
 });
