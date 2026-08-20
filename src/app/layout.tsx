@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import Link from "next/link";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 
@@ -39,9 +41,11 @@ export default function RootLayout({
           <strong>すしうさどっとねっと</strong>
           <p>配信活動を、少し便利に、少し楽しく。</p>
           <p>キャラクター制作　月乃美玲</p>
-          <p>匿名のアクセス統計にVercel Web Analyticsを使用しています</p>
+          <p>匿名のアクセス統計にVercel Web Analyticsを使用しています。入力した計画内容やライバー名は送信しません。</p>
+          <p><Link href="/privacy">アクセス解析とプライバシー</Link></p>
           <p>© すしうさどっとねっと</p>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
