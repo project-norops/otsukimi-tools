@@ -36,7 +36,8 @@ export function IconRingTool() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
-    context.clearRect(0, 0, ICON_OUTPUT_SIZE, ICON_OUTPUT_SIZE);
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, ICON_OUTPUT_SIZE, ICON_OUTPUT_SIZE);
     if (icon && transform) {
       const rect = getIconDrawRect(icon.element.naturalWidth, icon.element.naturalHeight, transform);
       context.drawImage(icon.element, rect.x, rect.y, rect.width, rect.height);
@@ -147,6 +148,6 @@ export function IconRingTool() {
         <button className="button icon-save" type="button" onClick={saveImage} disabled={!icon || !ring || saving} aria-busy={saving}>{saving ? "PNGを作成中…" : "画像を保存"}</button>
       </div>
     </div>
-    <p className="disclaimer">出力は513×513pxのPNGです。リングは規定サイズで作成された透過PNGをご使用ください。画像はサーバーへ送信されません。</p>
+    <p className="disclaimer">出力は白背景・513×513pxのPNGです。リングは規定サイズで作成された透過PNGをご使用ください。画像はサーバーへ送信されません。</p>
   </section>;
 }
