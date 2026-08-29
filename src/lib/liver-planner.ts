@@ -54,6 +54,7 @@ function cryptoSafeId() { return `lp-${Date.now()}-${Math.random().toString(36).
 export function addDays(date: string, count: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + count); return formatDate(value); }
 export function formatDate(value: Date) { return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`; }
 export function datesBetween(start: string, count: number) { return Array.from({ length: count }, (_, index) => addDays(start, index)); }
+export function tuesdayFor(date: string) { const value = new Date(`${date}T12:00:00`); return addDays(date, -((value.getDay() + 5) % 7)); }
 export function labelDate(date: string) { return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", weekday: "short" }).format(new Date(`${date}T12:00:00`)); }
 
 export type RankCalendarItem = { date: string; title: string; memo?: string };

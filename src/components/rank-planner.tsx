@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   RANKS,
@@ -596,9 +597,10 @@ function MonthCalendar({
     <article className="month-card">
       <header>
         <h2>{month.replace("-", "年")}月</h2>
-        <button className="text-button" onClick={onPng}>
-          この月をPNG保存
-        </button>
+        <div className="month-export-actions">
+          <button className="text-button" onClick={onPng}>この月をPNG保存</button>
+          <Link className="text-button weekly-png-link" href="/tools/liver-planner?weeklyImage=1">ライバー手帳で週間PNGを作る</Link>
+        </div>
       </header>
       <div className="weekdays">
         {WEEKDAY_HEADERS.map((day) => (
