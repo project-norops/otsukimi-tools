@@ -147,14 +147,17 @@ function WeeklyImageEditor({ days, weekStart, onWeekChange, onClose, onSaved }: 
     if (!shareFile || typeof navigator === "undefined" || !navigator.share || !navigator.canShare) return false;
     try { return navigator.canShare({ files: [shareFile] }); } catch { return false; }
   })();
-  const shareImage = async () => {
+  const shareImage = () => {
     if (!shareFile || !navigator.share) return;
     try {
-      await navigator.share({ files: [shareFile], title: "週間スケジュール画像" });
+      const result = navigator.share({ files: [shareFile] });
       setSaveStarted(true);
       onSaved();
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
+      void result.catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        alert("画像を共有できませんでした。もう一度お試しください。");
+      });
+    } catch {
       alert("画像を共有できませんでした。もう一度お試しください。");
     }
   };
