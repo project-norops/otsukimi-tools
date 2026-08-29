@@ -51,7 +51,8 @@ describe("weekly planner share image", () => {
     expect(component).toContain('canvas.toBlob(resolve, "image/png")');
     expect(component).toContain("URL.createObjectURL(blob)");
     expect(component).toContain("navigator.canShare({ files: [shareFile] })");
-    expect(component).toContain("navigator.share({ files: [shareFile]");
+    expect(component).toContain("navigator.share({ files: [shareFile] })");
+    expect(component).not.toContain('title: "週間スケジュール画像"');
     expect(component).toContain("共有メニューから「画像を保存」");
   });
 });
