@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LIVER_PLANNER_VERSION, addDays, normalizeLiverPlannerState, rankCalendarItems, readLiverPlannerState } from "@/lib/liver-planner";
+import { LIVER_PLANNER_VERSION, addDays, normalizeLiverPlannerState, rankCalendarItems, readLiverPlannerState, tuesdayFor } from "@/lib/liver-planner";
 
 describe("liver planner storage", () => {
   it("normalizes valid saved data and ignores malformed entries", () => {
@@ -9,6 +9,11 @@ describe("liver planner storage", () => {
   it("returns an empty state for corrupt JSON", () => {
     expect(readLiverPlannerState("not json").events).toEqual([]);
     expect(addDays("2026-07-31", 1)).toBe("2026-08-01");
+  });
+  it("uses Tuesday through Monday as the image week", () => {
+    expect(tuesdayFor("2026-08-29")).toBe("2026-08-25");
+    expect(tuesdayFor("2026-08-25")).toBe("2026-08-25");
+    expect(tuesdayFor("2026-08-31")).toBe("2026-08-25");
   });
   it("mirrors default +1, SP grants, rank decisions, and anniversaries from the rank calendar", () => {
     const items = rankCalendarItems({ version: 2, input: { baseDate: "2026-07-20", rank: "C1", score: 11, remainingDaysDisplay: 0, skipPasses: 0, simulationMonths: 1, debutDate: "2026-04-20" }, plans: {} });

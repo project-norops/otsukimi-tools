@@ -235,6 +235,8 @@
 .liver-storage-note { max-width: 100%; margin: 18px 0 0; }
 .liver-rank-note { display: grid; gap: 3px; margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--light-green); color: var(--sub); font-size: 12px; line-height: 1.6; }
 .liver-rank-note b { color: var(--green); }
+.liver-rank-note strong { color: var(--text); }
+.liver-rank-link { width: fit-content; margin-top: 4px; padding: 7px 10px; border-radius: 999px; background: var(--white); color: var(--pink); font-weight: 900; }
 .liver-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .liver-section { padding: 20px; border: 1px solid var(--border); border-radius: 22px; background: var(--white); box-shadow: 0 8px 28px rgb(22 71 61 / 5%); min-width: 0; }
 .liver-section h2 { margin: 0 0 14px; font-size: 20px; }
@@ -290,6 +292,25 @@
 .liver-backup { justify-content: center; margin-top: 24px; padding: 14px; background: var(--pale-pink); border-radius: 16px; font-size: 13px; }
 .liver-backup > span { color: var(--sub); font-weight: 800; }
 .liver-modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: end center; padding: 16px; background: rgb(53 37 31 / 35%); }
+.weekly-image-modal { place-items: center; }
+.weekly-image-editor { width: min(980px, 100%); max-height: 94vh; overflow: auto; padding: 22px; background: var(--white); border-radius: 24px; box-shadow: 0 16px 48px rgb(53 37 31 / 22%); }
+.weekly-image-editor > header, .weekly-image-editor > footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.weekly-image-editor > header span { color: var(--pink); font-size: 12px; font-weight: 900; }
+.weekly-image-editor h2 { margin: 2px 0 0; }
+.weekly-image-editor > header > button { flex: 0 0 auto; border: 0; background: transparent; color: var(--pink); font-weight: 800; white-space: nowrap; }
+.weekly-image-editor canvas { display: block; width: 100%; height: auto; margin: 14px 0; border: 1px solid var(--border); border-radius: 14px; background: var(--pale-pink); }
+.weekly-image-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+.weekly-image-nav button { border: 0; border-radius: 999px; padding: 8px 12px; background: var(--pale-pink); color: var(--pink); font-weight: 800; }
+.weekly-image-help { margin: 12px 0 0; color: var(--sub); font-size: 13px; text-align: center; }
+.weekly-image-editor details { margin: 12px 0 18px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; }
+.weekly-image-editor summary { color: var(--pink); cursor: pointer; font-weight: 900; }
+.weekly-image-options { display: grid; gap: 12px; margin-top: 14px; }
+.weekly-image-options > label, .weekly-thumbnail-grid label { display: grid; gap: 5px; color: var(--sub); font-size: 13px; font-weight: 800; }
+.weekly-image-options input { width: 100%; min-height: 42px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 9px; background: var(--white); font-size: 16px; }
+.weekly-thumbnail-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.weekly-thumbnail-grid label { padding: 9px; border-radius: 10px; background: var(--pale-pink); }
+.weekly-thumbnail-grid label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.weekly-thumbnail-grid img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 7px; }
 .liver-editor { width: min(620px, 100%); max-height: 92vh; overflow: auto; padding: 22px; background: var(--white); border-radius: 24px; box-shadow: 0 16px 48px rgb(53 37 31 / 22%); }
 .liver-editor header, .liver-editor footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .liver-editor h2 { margin: 0; font-size: 22px; }
@@ -300,6 +321,7 @@
 .liver-planner .editor-fields input, .liver-planner .editor-fields select, .liver-planner .editor-fields textarea { width: 100%; min-height: 44px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); color: var(--text); font-size: 16px; }
 .liver-planner .editor-fields textarea { min-height: 92px; resize: vertical; }
 .liver-planner .time-select-note { grid-column: 1 / -1; margin: 0; color: var(--sub); font-size: 12px; font-weight: 700; }
+.liver-planner .legacy-stream-note { grid-column: 1 / -1; margin: 0; padding: 9px 10px; border-radius: 10px; background: var(--pale-pink); color: var(--warning); font-size: 12px; font-weight: 800; }
 .liver-planner .editor-fields .check-label { display: flex; align-items: center; gap: 8px; }
 .liver-planner .editor-fields .check-label input { width: 18px; min-height: auto; }
 .liver-planner .delete-button { border: 0; background: transparent; color: var(--warning); font-weight: 800; }
@@ -310,9 +332,14 @@
   .liver-tabs button { padding: 8px 9px; font-size: 12px; }
   .liver-actions { width: 100%; }
   .liver-actions .button { flex: 1; }
+  .liver-actions .week-image-launch { flex-basis: 100%; }
   .liver-sections { grid-template-columns: 1fr; }
   .liver-sections .liver-section:nth-child(2), .liver-sections .liver-section:nth-child(5) { grid-column: auto; }
   .liver-section { padding: 16px; }
+  .weekly-image-editor { padding: 16px; }
+  .weekly-image-options { grid-template-columns: 1fr; }
+  .weekly-thumbnail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .weekly-image-nav { gap: 6px; font-size: 12px; }
   .liver-planner .agenda-row { grid-template-columns: 48px minmax(0, 1fr); }
   .liver-planner .agenda-row aside { grid-column: 2; }
   .liver-planner .editor-fields { grid-template-columns: 1fr; }
