@@ -104,6 +104,8 @@ function WeeklyImageEditor({ days, weekStart, onWeekChange, onClose, onSaved }: 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [heading, setHeading] = useState("");
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
+  const [downloadUrl, setDownloadUrl] = useState<string>();
+  const [saveStarted, setSaveStarted] = useState(false);
   const previewDays = useMemo(() => days.map((day) => {
     const thumbnail = thumbnails[day.date];
     if (!thumbnail) return day;
@@ -115,8 +117,19 @@ function WeeklyImageEditor({ days, weekStart, onWeekChange, onClose, onSaved }: 
     const canvas = canvasRef.current;
     if (!canvas) return;
     let cancelled = false;
-    void (async () => { await document.fonts.ready; if (!cancelled) await drawWeeklyPlannerImage(canvas, previewDays, { heading }); })();
-    return () => { cancelled = true; };
+    let objectUrl: string | undefined;
+    setDownloadUrl(undefined);
+    setSaveStarted(false);
+    void (async () => {
+      await document.fonts.ready;
+      if (cancelled) return;
+      await drawWeeklyPlannerImage(canvas, previewDays, { heading });
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (cancelled || !blob) return;
+      objectUrl = URL.createObjectURL(blob);
+      setDownloadUrl(objectUrl);
+    })();
+    return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [heading, previewDays]);
 
   const readImage = async (file: File | undefined, date: string) => {
@@ -126,16 +139,7 @@ function WeeklyImageEditor({ days, weekStart, onWeekChange, onClose, onSaved }: 
       setThumbnails((previous) => ({ ...previous, [date]: image }));
     } catch (error) { alert(error instanceof Error ? error.message : "画像を読み込めませんでした。"); }
   };
-  const save = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.href = await drawWeeklyPlannerImage(canvas, previewDays, { heading });
-    link.download = weeklyShareFilename(weekStart);
-    link.click(); onSaved(); onClose();
-  };
-
-  return <div className="liver-modal weekly-image-modal" role="dialog" aria-modal="true" aria-label="週間スケジュール画像を作る"><section className="weekly-image-editor"><header><div><span>火曜日〜月曜日</span><h2>週間スケジュール画像を作る</h2></div><button type="button" onClick={onClose}>閉じる</button></header><div className="weekly-image-nav"><button type="button" onClick={() => onWeekChange(addDays(weekStart, -7))}>前の週</button><b>{labelDate(days[0].date)} 〜 {labelDate(days[6].date)}</b><button type="button" onClick={() => onWeekChange(addDays(weekStart, 7))}>次の週</button></div><p className="weekly-image-help">ランク管理カレンダーの＋値とメモを反映した標準版を、そのまま保存できます。好みに合わせたい場合だけ各日のサムネを追加してください。</p><canvas ref={canvasRef} aria-label="週間スケジュール画像のプレビュー" /><details><summary>サムネを追加する（任意）</summary><div className="weekly-image-options"><label>見出し文字<input maxLength={40} placeholder="今週の配信スケジュール" value={heading} onChange={(event) => setHeading(event.target.value)} /></label><div className="weekly-thumbnail-grid">{days.map((day) => <label key={day.date}><b>{labelDate(day.date)}</b><span>{day.memo || "メモ未入力"}</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void readImage(event.target.files?.[0], day.date)} />{thumbnails[day.date] && <img src={thumbnails[day.date]} alt={`${labelDate(day.date)}のサムネ`} />}</label>)}</div></div></details><footer><button type="button" className="button secondary" onClick={onClose}>キャンセル</button><button type="button" className="button" onClick={() => void save()}>PNG画像を保存</button></footer></section></div>;
+  return <div className="liver-modal weekly-image-modal" role="dialog" aria-modal="true" aria-label="週間スケジュール画像を作る"><section className="weekly-image-editor"><header><div><span>火曜日〜月曜日</span><h2>週間スケジュール画像を作る</h2></div><button type="button" onClick={onClose}>閉じる</button></header><div className="weekly-image-nav"><button type="button" onClick={() => onWeekChange(addDays(weekStart, -7))}>前の週</button><b>{labelDate(days[0].date)} 〜 {labelDate(days[6].date)}</b><button type="button" onClick={() => onWeekChange(addDays(weekStart, 7))}>次の週</button></div><p className="weekly-image-help">ランク管理カレンダーの＋値とメモを反映した標準版を、そのまま保存できます。好みに合わせたい場合だけ各日のサムネを追加してください。</p><canvas ref={canvasRef} aria-label="週間スケジュール画像のプレビュー" /><details><summary>サムネを追加する（任意）</summary><div className="weekly-image-options"><label>見出し文字<input maxLength={40} placeholder="今週の配信スケジュール" value={heading} onChange={(event) => setHeading(event.target.value)} /></label><div className="weekly-thumbnail-grid">{days.map((day) => <label key={day.date}><b>{labelDate(day.date)}</b><span>{day.memo || "メモ未入力"}</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void readImage(event.target.files?.[0], day.date)} />{thumbnails[day.date] && <img src={thumbnails[day.date]} alt={`${labelDate(day.date)}のサムネ`} />}</label>)}</div></div></details><footer><button type="button" className="button secondary" onClick={onClose}>キャンセル</button>{saveStarted && <span className="weekly-save-status" role="status">保存を開始しました</span>}<a className="button weekly-download" href={downloadUrl} download={weeklyShareFilename(weekStart)} aria-disabled={!downloadUrl} onClick={(event) => { if (!downloadUrl) { event.preventDefault(); return; } setSaveStarted(true); onSaved(); }}>PNG画像を保存</a></footer></section></div>;
 }
 
 function EditorShell({ title, children, onClose, onDelete, onSave }: { title: string; children: React.ReactNode; onClose: () => void; onDelete?: () => void; onSave: () => void }) { return <div className="liver-modal" role="dialog" aria-modal="true"><form className="liver-editor" onSubmit={(event) => { event.preventDefault(); onSave(); }}><header><h2>{title}</h2><button type="button" onClick={onClose}>閉じる</button></header>{children}<footer>{onDelete && <button className="delete-button" type="button" onClick={onDelete}>削除</button>}<button className="button" type="submit">保存</button></footer></form></div>; }
