@@ -42,4 +42,13 @@ describe("weekly planner share image", () => {
     expect(component).not.toContain("背景の装飾画像");
     expect(component).not.toContain("decorationImage");
   });
+  it("uses a native download link for the PNG", () => {
+    const component = readFileSync(new URL("../components/liver-planner.tsx", import.meta.url), "utf8");
+    expect(component).toContain("const [downloadUrl, setDownloadUrl]");
+    expect(component).toContain("href={downloadUrl}");
+    expect(component).toContain("download={weeklyShareFilename(weekStart)}");
+    expect(component).toContain("aria-disabled={!downloadUrl}");
+    expect(component).toContain('canvas.toBlob(resolve, "image/png")');
+    expect(component).toContain("URL.createObjectURL(blob)");
+  });
 });
