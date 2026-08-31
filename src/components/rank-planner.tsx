@@ -33,6 +33,43 @@ const values: { value: PlanValue; label: string }[] = [
 ];
 const labelPlan = (value: PlanValue) =>
   values.find((item) => item.value === value)?.label ?? "";
+const pngPlanBadgeColors: Partial<Record<PlanValue, { background: string; text: string }>> = {
+  1: { background: "#ffe6a7", text: "#6b4700" },
+  2: { background: "#cfe4ff", text: "#234f7d" },
+  4: { background: "#ffb3d0", text: "#7d2345" },
+  6: { background: "#c72f5b", text: "#fff" },
+  skip: { background: "#e4f0eb", text: "#276837" },
+};
+const pngRankEventBadgeColors = {
+  "rank-chip up": { background: "#fce2e8", text: "#b62e54" },
+  "rank-chip keep": { background: "#e4f0eb", text: "#276837" },
+  "rank-chip down": { background: "#fff0df", text: "#9c5618" },
+} as const;
+const PNG_PRIMARY_LABEL_FONT_SIZE = 20;
+const PNG_RANK_BAND_HEIGHT = 28;
+const drawPngBadge = (
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  x: number,
+  y: number,
+  colors: { background: string; text: string },
+  fontSize = 12,
+  height = 24,
+  maxWidth = 116,
+) => {
+  ctx.save();
+  ctx.font = `700 ${fontSize}px sans-serif`;
+  const width = Math.min(Math.ceil(ctx.measureText(label).width) + 12, maxWidth);
+  ctx.fillStyle = colors.background;
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, height, 6);
+  ctx.fill();
+  ctx.fillStyle = colors.text;
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, x + 6, y + height / 2, width - 12);
+  ctx.restore();
+  return width;
+};
 const numberOptions = (maximum: number) =>
   Array.from({ length: maximum + 1 }, (_, value) => value);
 const simulationMonthOptions: SimulationMonths[] = [1, 2, 3];
@@ -220,7 +257,7 @@ export function RankPlanner() {
         y = 160 + Math.floor(cell / 7) * 146;
       ctx.fillStyle = simulationDaysByDate[dateString] ? "#FFF5F8" : "#F2ECE8";
       ctx.beginPath();
-      ctx.roundRect(x, y, 138, 132, 18);
+      ctx.roundRect(x, y, 138, 140, 18);
       ctx.fill();
       ctx.font = "22px sans-serif";
       ctx.fillStyle = simulationDaysByDate[dateString] ? WEEKDAY_COLORS[getWeekdayKind(dateString)] : "#A69A94";
@@ -233,35 +270,57 @@ export function RankPlanner() {
       const palette = getRankPalette(band.rank);
       ctx.fillStyle = palette.background;
       ctx.beginPath();
-      ctx.roundRect(x, y, width, 20, band.continuesBefore || band.continuesAfter ? 5 : 10);
+      ctx.roundRect(x, y, width, PNG_RANK_BAND_HEIGHT, band.continuesBefore || band.continuesAfter ? 7 : 14);
       ctx.fill();
       ctx.strokeStyle = palette.border;
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.fillStyle = palette.text;
-      ctx.font = "700 14px sans-serif";
+      ctx.font = `700 ${PNG_PRIMARY_LABEL_FONT_SIZE}px sans-serif`;
       ctx.textAlign = "center";
-      ctx.fillText(band.rank, x + width / 2, y + 15);
+      ctx.textBaseline = "middle";
+      ctx.fillText(band.rank, x + width / 2, y + PNG_RANK_BAND_HEIGHT / 2);
       ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
     });
     days.forEach((day) => {
       const date = parseDate(day.date),
         cell = first + date.getDate() - 1,
         x = 54 + (cell % 7) * 154,
         y = 160 + Math.floor(cell / 7) * 146;
-      ctx.fillStyle = day.plan.value === "skip" ? "#39864c" : "#d83e68";
-      ctx.font = "700 25px sans-serif";
-      ctx.fillText(day.skipValid ? labelPlan(day.plan.value) : "SKIP不可", x + 12, y + 82);
+      const planLabel = day.skipValid ? labelPlan(day.plan.value) : "SKIP不可";
+      const planBadgeColors = day.skipValid
+        ? pngPlanBadgeColors[day.plan.value]
+        : { background: "#f1ecee", text: "#9a6874" };
+      if (planBadgeColors) drawPngBadge(ctx, planLabel, x + 12, y + 66, planBadgeColors, PNG_PRIMARY_LABEL_FONT_SIZE, 26);
+      else {
+        ctx.fillStyle = "#d83e68";
+        ctx.font = "700 25px sans-serif";
+        ctx.fillText(planLabel, x + 12, y + 91);
+      }
       const events = getCalendarEventLabels(day);
       if (events.length > 0) {
-        ctx.fillStyle = "#555";
-        ctx.font = "700 13px sans-serif";
-        ctx.fillText(events.map((event) => event.compact).join(" / "), x + 12, y + 101, 116);
+        let eventX = x + 12;
+        events.forEach((event) => {
+          const remainingWidth = x + 128 - eventX;
+          if (remainingWidth <= 0) return;
+          if (event.className === "grant-chip") {
+            ctx.fillStyle = "#555";
+            ctx.font = "700 13px sans-serif";
+            ctx.fillText(event.compact, eventX, y + 110, remainingWidth);
+            eventX += Math.min(Math.ceil(ctx.measureText(event.compact).width), remainingWidth) + 6;
+            return;
+          }
+          const colors = pngRankEventBadgeColors[event.className as keyof typeof pngRankEventBadgeColors];
+          if (colors) eventX += drawPngBadge(ctx, event.compact, eventX, y + 96, colors, 12, 20, remainingWidth) + 3;
+        });
       }
       const memoLines = getPngMemoLines(day.plan.memo);
       ctx.fillStyle = "#755F25";
-      ctx.font = "12px sans-serif";
-      memoLines.forEach((line, index) => ctx.fillText(line, x + 12, y + 117 + index * 13, 116));
+      ctx.font = events.length > 0 ? "10px sans-serif" : "12px sans-serif";
+      const memoStartY = events.length > 0 ? y + 127 : y + 117;
+      const memoLineHeight = events.length > 0 ? 11 : 13;
+      memoLines.forEach((line, index) => ctx.fillText(line, x + 12, memoStartY + index * memoLineHeight, 116));
     });
     canvas.toBlob(
       (blob) => blob && download(blob, `rank-plan-${month}.png`),
